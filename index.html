@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凪 -nagi- | メンバー限定サイト</title>
+    
+    <!-- LINE/SNS用設定 (OGP) -->
+    <meta property="og:title" content="凪 -nagi- | びらふマルシェ特設サイト">
+    <meta property="og:description" content="合言葉を入力して詳細をチェックしてください。">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=600">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'nagi-bg': '#F9FAFB',
+                        'nagi-green': '#4ADE80',
+                        'nagi-blue': '#60A5FA',
+                    },
+                    fontFamily: { sans: ['"Noto Sans JP"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F9FAFB; color: #374151; overflow-x: hidden; }
+        /* 初期状態はコンテンツを隠す */
+        #protected-content { display: none; }
+        #password-screen { display: flex; }
+        
+        #game-area { position: relative; width: 100%; max-width: 400px; height: 400px; background: linear-gradient(to bottom, #E0F2FE, #BBF7D0); border-radius: 1rem; overflow: hidden; margin: 0 auto; border: 4px solid #fff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); touch-action: none; }
+        #falling-stick { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 20px; height: 100px; background: linear-gradient(to bottom, #EF4444, #FCD34D); border-radius: 10px; cursor: pointer; display: none; }
+        .bg-grass { background-image: radial-gradient(#d1fae5 1px, transparent 1px); background-size: 20px 20px; }
+        .photo-frame { position: relative; background: #fff; padding: 12px 12px 48px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: rotate(-1deg); }
+        .photo-label { position: absolute; bottom: 12px; left: 0; width: 100%; text-align: center; font-family: cursive; color: #9ca3af; font-size: 0.8rem; }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- パスワード入力画面 -->
+    <div id="password-screen" class="fixed inset-0 z-[100] bg-white flex-col items-center justify-center p-6 text-center">
+        <div class="mb-8">
+            <span class="text-4xl">🌿</span>
+            <h1 class="text-xl font-bold mt-4 text-gray-800 tracking-wider text-nagi-green">凪 -nagi-</h1>
+            <p class="text-sm text-gray-500 mt-2 italic font-bold">メンバー限定特設サイト</p>
+        </div>
+        <div class="w-full max-w-xs space-y-4">
+            <p class="text-xs text-gray-400 font-bold">合言葉を入力してください</p>
+            <input type="password" id="pass-input" placeholder="合言葉" 
+                   class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-nagi-green outline-none text-center tracking-widest transition shadow-sm">
+            <button onclick="checkPassword()" 
+                    class="w-full py-3 bg-nagi-green text-white font-bold rounded-xl shadow-md active:scale-95 transition">
+                サイトを表示する
+            </button>
+            <p id="error-msg" class="text-red-500 text-xs font-bold hidden">合言葉が違います</p>
+        </div>
+        <p class="mt-12 text-[10px] text-gray-300">※合言葉はグループLINEでお知らせしています。</p>
+    </div>
+
+    <!-- メインコンテンツ (最初は非表示) -->
+    <div id="protected-content">
+        <!-- Navigation -->
+        <nav class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50">
+            <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+                <span class="text-xl font-bold text-nagi-green tracking-wider">凪 -nagi-</span>
+                <div class="flex space-x-4 text-xs font-bold italic">
+                    <a href="#about" class="text-gray-600 hover:text-nagi-green">INFO</a>
+                    <a href="#lineup" class="text-gray-600 hover:text-nagi-green">LINEUP</a>
+                    <a href="#game" class="text-gray-600 hover:text-nagi-green">GAME</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <header class="pt-24 pb-12 bg-gradient-to-b from-blue-100 via-blue-50 to-green-50">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <div class="inline-block mb-4 px-4 py-1 bg-white rounded-full shadow-sm text-sm font-bold text-nagi-blue animate-bounce">
+                    ✨ びらふマルシェ出店 ✨
+                </div>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 leading-tight mb-6">芝生の上で出会う、<br>カラフルな相棒。</h1>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-lg inline-block border-2 border-green-100">
+                    <p class="text-xs text-gray-500 mb-2 font-bold italic">2026.03.21 SAT 開催まで</p>
+                    <div id="countdown" class="flex gap-4 justify-center">
+                        <div class="flex flex-col"><span id="cd-days" class="text-2xl font-bold text-nagi-green">00</span><span class="text-[10px] text-gray-400 uppercase font-bold">Days</span></div>
+                        <div class="flex flex-col"><span id="cd-hours" class="text-2xl font-bold text-nagi-green">00</span><span class="text-[10px] text-gray-400 uppercase font-bold">Hrs</span></div>
+                        <div class="flex flex-col"><span id="cd-mins" class="text-2xl font-bold text-nagi-green">00</span><span class="text-[10px] text-gray-400 uppercase font-bold">Min</span></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Lineup Section -->
+        <section id="lineup" class="py-12 bg-white bg-grass">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="text-center mb-10">
+                    <h2 class="text-2xl font-bold text-gray-800 tracking-widest">🛍️ LINEUP</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="flex justify-center">
+                        <div class="photo-frame max-w-sm w-full">
+                            <div class="aspect-square bg-gray-100 overflow-hidden flex items-center justify-center relative">
+                                <img id="main-photo" src="bag-photo.jpg" alt="凪-nagi-バッグ" class="w-full h-full object-cover">
+                                <div id="photo-error" class="hidden absolute inset-0 bg-gray-50 flex flex-col items-center justify-center p-6 text-center text-[10px] text-gray-400 font-bold">
+                                    <span class="text-2xl mb-2">📸</span>
+                                    画像読込エラー
+                                </div>
+                            </div>
+                            <div class="photo-label font-bold text-gray-400 italic">nagi - Special Edition</div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-nagi-blue text-lg mb-3 italic">Check Point!</h3>
+                            <ul class="text-sm space-y-2 text-gray-600 font-bold">
+                                <li>🎨 1点もののハンドメイド</li>
+                                <li>🚿 汚れても水洗いOK！</li>
+                                <li>👜 お買い物から温泉まで大活躍</li>
+                            </ul>
+                        </div>
+                        <div class="text-center md:text-left bg-nagi-green/10 p-6 rounded-2xl border border-nagi-green/20">
+                            <p class="text-4xl font-extrabold text-gray-800 tracking-tighter">¥500 <span class="text-xl font-normal text-gray-400">〜</span> ¥3,000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Section -->
+        <section id="game" class="py-12 bg-blue-50">
+            <div class="max-w-6xl mx-auto px-4 text-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-8 tracking-widest">🎮 MINI GAME</h2>
+                <div id="game-area">
+                    <div id="falling-stick"></div>
+                    <div class="absolute bottom-4 w-full text-center text-[10px] text-blue-400 font-bold italic uppercase tracking-widest">Practice Mode</div>
+                </div>
+                <button id="start-game-btn" class="mt-6 px-12 py-4 bg-nagi-blue text-white font-bold rounded-xl shadow-lg transition active:scale-95">挑戦する！</button>
+                <div id="game-result" class="hidden mt-4 p-4 rounded-xl border font-bold"></div>
+            </div>
+        </section>
+
+        <!-- Info Section -->
+        <section id="about" class="py-12 bg-white">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="bg-nagi-bg p-8 rounded-3xl border border-gray-100">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-8 tracking-widest italic leading-tight">EVENT INFO</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-center">
+                                <div class="bg-white p-2 rounded-lg shadow-sm">📅</div>
+                                <p class="font-bold">2026年3月21日(土) <span class="text-gray-400">10:00-14:00</span></p>
+                            </div>
+                            <div class="flex gap-4 items-center">
+                                <div class="bg-white p-2 rounded-lg shadow-sm">📍</div>
+                                <p class="font-bold leading-tight">健康センターセレネ広場<br><span class="text-xs text-gray-400">（アンパンマンミュージアム横）</span></p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border-2 border-dashed border-gray-200 text-center font-bold text-nagi-green italic">
+                            当日、このページを<br>「合言葉」と一緒に見せてね！🎁
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-white py-12 text-center">
+            <p class="font-bold text-xl mb-2 tracking-widest italic">凪 -nagi-</p>
+            <p class="text-gray-500 text-[10px] uppercase font-bold">Member Only Site</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- 合言葉の設定 ---
+        const SECRET_WORD = "nagi"; // ← ここを好きな言葉に変えられます
+
+        function checkPassword() {
+            const input = document.getElementById('pass-input').value;
+            const error = document.getElementById('error-msg');
+            const screen = document.getElementById('password-screen');
+            const content = document.getElementById('protected-content');
+
+            if (input === SECRET_WORD) {
+                screen.style.display = 'none';
+                content.style.display = 'block';
+                window.scrollTo(0, 0);
+            } else {
+                error.classList.remove('hidden');
+                // 入力欄を赤くフラッシュさせる演出
+                document.getElementById('pass-input').classList.add('border-red-300');
+                setTimeout(() => document.getElementById('pass-input').classList.remove('border-red-300'), 500);
+            }
+        }
+
+        // Enterキーでも送信できるようにする
+        document.getElementById('pass-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        // 画像リトライ機能
+        const img = document.getElementById('main-photo');
+        const exts = ['jpg', 'JPG', 'png', 'jpeg'];
+        let extIdx = 0;
+        img.onerror = function() {
+            if (extIdx < exts.length) {
+                this.src = 'bag-photo.' + exts[extIdx++];
+            } else {
+                this.style.display = 'none';
+                document.getElementById('photo-error').classList.remove('hidden');
+            }
+        };
+
+        // カウントダウン
+        const eventDate = new Date('2026-03-21T10:00:00').getTime();
+        function updateCountdown() {
+            const distance = eventDate - new Date().getTime();
+            if (distance < 0) return;
+            document.getElementById("cd-days").innerText = Math.floor(distance / 86400000).toString().padStart(2, '0');
+            document.getElementById("cd-hours").innerText = Math.floor((distance % 86400000) / 3600000).toString().padStart(2, '0');
+            document.getElementById("cd-mins").innerText = Math.floor((distance % 3600000) / 60000).toString().padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ゲーム
+        const startBtn = document.getElementById('start-game-btn');
+        const stick = document.getElementById('falling-stick');
+        const resultDisplay = document.getElementById('game-result');
+        let gameInProgress = false;
+        let stickAnimation;
+
+        startBtn.onclick = () => {
+            if(gameInProgress) return;
+            gameInProgress = true;
+            resultDisplay.classList.add('hidden');
+            startBtn.innerText = "集中...";
+            startBtn.disabled = true;
+            stick.style.display = 'none';
+            stick.style.top = '-100px';
+
+            setTimeout(() => {
+                stick.style.display = 'block';
+                void stick.offsetWidth;
+                stick.style.transition = 'top 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+                stick.style.top = '450px';
+                stickAnimation = setTimeout(() => endGame(false), 500);
+            }, Math.random() * 2000 + 1000);
+        };
+
+        const catchHandler = (e) => {
+            if(!gameInProgress) return;
+            e.preventDefault();
+            const currentTop = window.getComputedStyle(stick).top;
+            stick.style.transition = 'none';
+            stick.style.top = currentTop;
+            clearTimeout(stickAnimation);
+            endGame(true);
+        };
+        stick.onmousedown = catchHandler;
+        stick.ontouchstart = catchHandler;
+
+        function endGame(won) {
+            gameInProgress = false;
+            startBtn.disabled = false;
+            startBtn.innerText = "もう一度！";
+            resultDisplay.classList.remove('hidden');
+            resultDisplay.innerHTML = won ? "🎉 ナイスキャッチ！" : "💦 惜しい！";
+            resultDisplay.className = `mt-4 p-4 rounded-xl border font-bold ${won ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+        }
+    </script>
+</body>
+</html>

@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>凪 -nagi- | メンバー限定サイト</title>
+    <title>凪 -nagi- | メンバー限定・特典付きサイト</title>
     
-    <!-- LINE/SNS用設定 (OGP) -->
     <meta property="og:title" content="凪 -nagi- | びらふマルシェ特設サイト">
-    <meta property="og:description" content="合言葉を入力して詳細をチェックしてください。">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1590736704728-f4730bb30770?auto=format&fit=crop&q=80&w=600">
+    <meta property="og:description" content="合言葉を入力して、限定特典スタンプをゲットしてください！">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,250 +23,447 @@
             }
         }
     </script>
+
     <style>
-        body { background-color: #F9FAFB; color: #374151; overflow-x: hidden; }
-        /* 初期状態はコンテンツを隠す */
+        body { background-color: #F9FAFB; color: #374151; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         #protected-content { display: none; }
         #password-screen { display: flex; }
-        
-        #game-area { position: relative; width: 100%; max-width: 400px; height: 400px; background: linear-gradient(to bottom, #E0F2FE, #BBF7D0); border-radius: 1rem; overflow: hidden; margin: 0 auto; border: 4px solid #fff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); touch-action: none; }
-        #falling-stick { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 20px; height: 100px; background: linear-gradient(to bottom, #EF4444, #FCD34D); border-radius: 10px; cursor: pointer; display: none; }
         .bg-grass { background-image: radial-gradient(#d1fae5 1px, transparent 1px); background-size: 20px 20px; }
-        .photo-frame { position: relative; background: #fff; padding: 12px 12px 48px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transform: rotate(-1deg); }
-        .photo-label { position: absolute; bottom: 12px; left: 0; width: 100%; text-align: center; font-family: cursive; color: #9ca3af; font-size: 0.8rem; }
+
+        /* スタンプデザイン */
+        .stamp-circle { 
+            width: 80px; height: 80px; 
+            border: 3px double #ef4444; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            color: #ef4444; font-weight: bold; 
+            transform: rotate(-15deg); 
+            opacity: 0; transition: opacity 0.5s ease-out; 
+            position: relative;
+        }
+        .stamp-circle.active { opacity: 0.8; animation: stamp-anim 0.3s ease-in forwards; }
+
+        @keyframes stamp-anim {
+            0% { transform: scale(2) rotate(0deg); opacity: 0; }
+            100% { transform: scale(1) rotate(-15deg); opacity: 0.8; }
+        }
+
+        /* ゲームエリア */
+        #game-area { 
+            position: relative; width: 100%; max-width: 400px; height: 400px; 
+            background: linear-gradient(to bottom, #E0F2FE, #BBF7D0); 
+            border-radius: 1rem; overflow: hidden; margin: 0 auto; 
+            border: 4px solid #fff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
+            touch-action: none;
+        }
+        #falling-stick { 
+            position: absolute; top: -100px; left: 50%; transform: translateX(-50%); 
+            width: 24px; height: 120px; 
+            background: linear-gradient(to bottom, #EF4444, #FCD34D); 
+            border-radius: 12px; cursor: pointer; display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 成功ポップアップ */
+        #success-popup {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.2);
+            background: rgba(255,255,255,0.95);
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 32px;
+            font-weight: 900;
+            color: #f59e0b;
+            text-shadow: 0 0 10px #fcd34d;
+            opacity: 0;
+            z-index: 9999;
+            border: 4px solid #fbbf24;
+            box-shadow: 0 0 20px rgba(255, 200, 0, 0.6);
+            transition: all 0.4s ease-out;
+            pointer-events: none;
+        }
+        #success-popup.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* 成功メッセージの虹色アニメ */
+        .success-glow {
+            background: linear-gradient(90deg, #fde047, #fca5a5, #a5b4fc, #6ee7b7);
+            background-size: 400% 400%;
+            animation: glow 3s ease infinite;
+        }
+        @keyframes glow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 紙吹雪 */
+        .confetti {
+            position: fixed;
+            top: -20px;
+            width: 10px;
+            height: 16px;
+            background: hsl(calc(360 * var(--i)), 80%, 60%);
+            animation: fall 2s linear forwards;
+            opacity: 0.9;
+            z-index: 9998;
+        }
+        @keyframes fall {
+            to { transform: translateY(120vh) rotate(720deg); }
+        }
     </style>
 </head>
+
 <body class="antialiased font-sans">
 
-    <!-- パスワード入力画面 -->
-    <div id="password-screen" class="fixed inset-0 z-[100] bg-white flex-col items-center justify-center p-6 text-center">
-        <div class="mb-8">
-            <span class="text-4xl">🌿</span>
-            <h1 class="text-xl font-bold mt-4 text-gray-800 tracking-wider text-nagi-green">凪 -nagi-</h1>
-            <p class="text-sm text-gray-500 mt-2 italic font-bold">メンバー限定特設サイト</p>
+<!-- 成功ポップアップ -->
+<div id="success-popup">🎉 SUCCESS!! 🎉</div>
+
+<!-- パスワード入力画面 -->
+<div id="password-screen" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center p-6 text-center">
+    <div class="mb-8">
+        <span class="text-4xl">🌿</span>
+        <h1 class="text-xl font-bold mt-4 text-nagi-green tracking-wider">凪 -nagi-</h1>
+        <p class="text-sm text-gray-500 mt-2 italic font-bold">メンバー限定特典サイト</p>
+    </div>
+    <div class="w-full max-w-xs space-y-4">
+        <input type="password" id="pass-input" placeholder="合言葉を入力" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-nagi-green outline-none text-center tracking-widest transition shadow-sm">
+        <button onclick="checkPassword()" class="w-full py-3 bg-nagi-green text-white font-bold rounded-xl shadow-md active:scale-95 transition">ログインして特典をゲット</button>
+        <p id="error-msg" class="text-red-500 text-xs font-bold hidden">合言葉が違います</p>
+    </div>
+</div>
+
+<!-- メインコンテンツ -->
+<div id="protected-content">
+
+    <!-- Sticky Header -->
+    <div class="fixed top-0 left-0 w-full bg-red-600 text-white text-[10px] py-1 text-center font-bold z-[60] shadow-sm">
+        当日、この画面をブースのスタッフに見せてね！
+    </div>
+
+    <!-- Navigation -->
+    <nav class="pt-6 bg-white/90 backdrop-blur-sm shadow-sm z-50">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+            <span class="text-xl font-bold text-nagi-green tracking-wider">凪 -nagi-</span>
+            <div class="flex space-x-4 text-xs font-bold italic text-gray-400">
+                <a href="#stamp-section">STAMP</a>
+                <a href="#game">GAME</a>
+                <a href="#lineup">LINEUP</a>
+            </div>
         </div>
-        <div class="w-full max-w-xs space-y-4">
-            <p class="text-xs text-gray-400 font-bold">合言葉を入力してください</p>
-            <input type="password" id="pass-input" placeholder="合言葉" 
-                   class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-nagi-green outline-none text-center tracking-widest transition shadow-sm">
-            <button onclick="checkPassword()" 
-                    class="w-full py-3 bg-nagi-green text-white font-bold rounded-xl shadow-md active:scale-95 transition">
-                サイトを表示する
+    </nav>
+
+    <!-- Stamp Card Section -->
+    <section id="stamp-section" class="py-8 bg-blue-50 px-4">
+        <div class="max-w-md mx-auto bg-white rounded-3xl p-6 shadow-xl border-4 border-white ring-1 ring-gray-100">
+            <div class="text-center mb-6">
+                <h2 class="text-lg font-extrabold text-gray-800 tracking-tighter">デジタルスタンプカード</h2>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Special Benefit for Members</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <!-- 来場スタンプ -->
+                <div class="bg-gray-50 rounded-2xl p-4 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 min-h-[140px] relative">
+                    <p class="text-[9px] font-bold text-gray-400 mb-2 uppercase">Visit</p>
+                    <div id="stamp-visit" class="stamp-circle">
+                        <span class="text-center text-xs leading-none">凪<br><small class="text-[8px]">nagi</small></span>
+                    </div>
+                    <button id="visit-btn" onclick="applyStamp('visit')" class="mt-2 text-[8px] bg-white border border-gray-200 px-3 py-1 rounded-full text-gray-400 hover:bg-gray-100 transition shadow-sm">スタッフ確認</button>
+                </div>
+
+                <!-- ゲーム成功スタンプ -->
+                <div class="bg-gray-50 rounded-2xl p-4 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 min-h-[140px] relative">
+                    <p class="text-[9px] font-bold text-gray-400 mb-2 uppercase">Game Win</p>
+                    <div id="stamp-game" class="stamp-circle border-nagi-blue text-nagi-blue">
+                        <span class="text-center text-xs leading-none">WIN!<br><small class="text-[8px]">200円引</small></span>
+                    </div>
+                    <p id="game-status-text" class="mt-2 text-[8px] text-gray-300 font-bold tracking-tight">ゲームで獲得！</p>
+                </div>
+            </div>
+
+            <div id="coupon-area" class="hidden bg-yellow-100 border-2 border-yellow-400 rounded-xl p-3 text-center animate-pulse shadow-inner">
+                <p class="text-yellow-800 font-black text-sm">✨ 特典クーポン適用可能！ ✨</p>
+                <p class="text-[9px] text-yellow-600 font-bold">このままの状態でスタッフへ提示してください</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hero -->
+    <header class="pb-12 bg-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <div class="inline-block mt-8 mb-4 px-4 py-1 bg-white rounded-full shadow-sm text-sm font-bold text-nagi-blue border border-blue-100">
+                ✨ びらふマルシェ出店 ✨
+            </div>
+            <h1 class="text-2xl md:text-4xl font-extrabold text-gray-800 leading-tight mb-4">
+                芝生の上で出会う、<br>カラフルな相棒。
+            </h1>
+            
+            <div id="countdown" class="flex gap-4 justify-center bg-gray-50 p-4 rounded-2xl inline-flex shadow-inner">
+                <div class="flex flex-col"><span id="cd-days" class="text-xl font-bold text-nagi-green">00</span><span class="text-[8px] text-gray-400 font-bold">DAYS</span></div>
+                <div class="flex flex-col"><span id="cd-hours" class="text-xl font-bold text-nagi-green">00</span><span class="text-[8px] text-gray-400 font-bold">HRS</span></div>
+                <div class="flex flex-col"><span id="cd-mins" class="text-xl font-bold text-nagi-green">00</span><span class="text-[8px] text-gray-400 font-bold">MIN</span></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Game Section -->
+    <section id="game" class="py-12 bg-white border-y border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-gray-800 tracking-widest uppercase">Challenge Game</h2>
+                <p class="text-[10px] text-gray-500 mt-2 font-bold italic">落ちてくる棒をキャッチして「200円引」をゲットしよう！</p>
+            </div>
+
+            <div id="game-area">
+                <div id="falling-stick"></div>
+                <div class="absolute bottom-4 w-full text-center text-[10px] text-blue-400 font-bold italic uppercase tracking-widest opacity-60">
+                    Catch the Stick!
+                </div>
+            </div>
+
+            <button id="start-game-btn" class="mt-6 px-12 py-4 bg-nagi-blue text-white font-bold rounded-xl shadow-lg transition active:scale-95 hover:bg-blue-500">
+                ゲーム開始！
             </button>
-            <p id="error-msg" class="text-red-500 text-xs font-bold hidden">合言葉が違います</p>
+
+            <div id="game-result" class="hidden mt-4 p-4 rounded-xl border font-bold text-sm mx-auto max-w-sm"></div>
         </div>
-        <p class="mt-12 text-[10px] text-gray-300">※合言葉はグループLINEでお知らせしています。</p>
-    </div>
+    </section>
 
-    <!-- メインコンテンツ (最初は非表示) -->
-    <div id="protected-content">
-        <!-- Navigation -->
-        <nav class="fixed w-full bg-white/90 backdrop-blur-sm shadow-sm z-50">
-            <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
-                <span class="text-xl font-bold text-nagi-green tracking-wider">凪 -nagi-</span>
-                <div class="flex space-x-4 text-xs font-bold italic">
-                    <a href="#about" class="text-gray-600 hover:text-nagi-green">INFO</a>
-                    <a href="#lineup" class="text-gray-600 hover:text-nagi-green">LINEUP</a>
-                    <a href="#game" class="text-gray-600 hover:text-nagi-green">GAME</a>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Hero -->
-        <header class="pt-24 pb-12 bg-gradient-to-b from-blue-100 via-blue-50 to-green-50">
-            <div class="max-w-4xl mx-auto px-4 text-center">
-                <div class="inline-block mb-4 px-4 py-1 bg-white rounded-full shadow-sm text-sm font-bold text-nagi-blue animate-bounce">
-                    ✨ びらふマルシェ出店 ✨
-                </div>
-                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-800 leading-tight mb-6">芝生の上で出会う、<br>カラフルな相棒。</h1>
-                
-                <div class="bg-white p-6 rounded-2xl shadow-lg inline-block border-2 border-green-100">
-                    <p class="text-xs text-gray-500 mb-2 font-bold italic">2026.03.21 SAT 開催まで</p>
-                    <div id="countdown" class="flex gap-4 justify-center">
-                        <div class="flex flex-col"><span id="cd-days" class="text-2xl font-bold text-nagi-green">00</span><span class="text-[10px] text-gray-400 uppercase font-bold">Days</span></div>
-                        <div class="flex flex-col"><span id="cd-hours" class="text-2xl font-bold text-nagi-green">00</span><span class="text-[10px] text-gray-400 uppercase font-bold">Hrs</span></div>
-                        <div class="flex flex-col"><span id="cd-mins" class="text-2xl font-bold text-nagi-green">00</span><span class="text-[10px] text-gray-400 uppercase font-bold">Min</span></div>
+    <!-- Lineup -->
+    <section id="lineup" class="py-16 bg-white bg-grass">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="photo-frame max-w-[280px] w-full mx-auto">
+                    <div class="aspect-square bg-white shadow-lg overflow-hidden relative border-8 border-white rounded-lg rotate-2">
+                        <img id="main-photo" src="bag-photo.jpg" alt="凪-nagi-バッグ" class="w-full h-full object-cover">
                     </div>
                 </div>
-            </div>
-        </header>
 
-        <!-- Lineup Section -->
-        <section id="lineup" class="py-12 bg-white bg-grass">
-            <div class="max-w-6xl mx-auto px-4">
-                <div class="text-center mb-10">
-                    <h2 class="text-2xl font-bold text-gray-800 tracking-widest">🛍️ LINEUP</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div class="flex justify-center">
-                        <div class="photo-frame max-w-sm w-full">
-                            <div class="aspect-square bg-gray-100 overflow-hidden flex items-center justify-center relative">
-                                <img id="main-photo" src="bag-photo.jpg" alt="凪-nagi-バッグ" class="w-full h-full object-cover">
-                                <div id="photo-error" class="hidden absolute inset-0 bg-gray-50 flex flex-col items-center justify-center p-6 text-center text-[10px] text-gray-400 font-bold">
-                                    <span class="text-2xl mb-2">📸</span>
-                                    画像読込エラー
-                                </div>
-                            </div>
-                            <div class="photo-label font-bold text-gray-400 italic">nagi - Special Edition</div>
-                        </div>
-                    </div>
-                    <div class="space-y-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 class="font-bold text-nagi-blue text-lg mb-3 italic">Check Point!</h3>
-                            <ul class="text-sm space-y-2 text-gray-600 font-bold">
-                                <li>🎨 1点もののハンドメイド</li>
-                                <li>🚿 汚れても水洗いOK！</li>
-                                <li>👜 お買い物から温泉まで大活躍</li>
-                            </ul>
-                        </div>
-                        <div class="text-center md:text-left bg-nagi-green/10 p-6 rounded-2xl border border-nagi-green/20">
-                            <p class="text-4xl font-extrabold text-gray-800 tracking-tighter">¥500 <span class="text-xl font-normal text-gray-400">〜</span> ¥3,000</p>
-                        </div>
-                    </div>
+                <div class="flex-1 text-center md:text-left space-y-4">
+                    <h3 class="text-xl font-bold text-gray-800">丈夫でカラフル。</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed font-bold">
+                        PPバンドを一つひとつ手編みしたバッグ。水洗いOK、丈夫で軽量。お買い物や温泉、ピクニックの相棒に。
+                    </p>
+                    <p class="text-3xl font-black text-gray-800 tracking-tighter">
+                        ¥1,000 <span class="text-sm font-normal text-gray-400">〜</span> ¥3,000
+                    </p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Game Section -->
-        <section id="game" class="py-12 bg-blue-50">
-            <div class="max-w-6xl mx-auto px-4 text-center">
-                <h2 class="text-2xl font-bold text-gray-800 mb-8 tracking-widest">🎮 MINI GAME</h2>
-                <div id="game-area">
-                    <div id="falling-stick"></div>
-                    <div class="absolute bottom-4 w-full text-center text-[10px] text-blue-400 font-bold italic uppercase tracking-widest">Practice Mode</div>
-                </div>
-                <button id="start-game-btn" class="mt-6 px-12 py-4 bg-nagi-blue text-white font-bold rounded-xl shadow-lg transition active:scale-95">挑戦する！</button>
-                <div id="game-result" class="hidden mt-4 p-4 rounded-xl border font-bold"></div>
+    <!-- 特典説明セクション -->
+    <section class="py-10 bg-white px-4 border-t border-gray-100">
+        <div class="max-w-md mx-auto text-center space-y-6">
+            <!-- 来場特典 -->
+            <div class="bg-green-50 border-2 border-green-100 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-extrabold text-green-600 mb-2">📌 来場特典（500円引き）</h3>
+                <p class="text-[12px] text-gray-600 font-bold leading-relaxed">
+                    このページの「来場スタンプ」が押されていれば、<br>
+                    <span class="text-gray-800 underline decoration-green-400 decoration-2">3,000円以上のバッグが500円引き</span>になります。
+                </p>
             </div>
-        </section>
 
-        <!-- Info Section -->
-        <section id="about" class="py-12 bg-white">
-            <div class="max-w-4xl mx-auto px-4">
-                <div class="bg-nagi-bg p-8 rounded-3xl border border-gray-100">
-                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-8 tracking-widest italic leading-tight">EVENT INFO</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                        <div class="space-y-4">
-                            <div class="flex gap-4 items-center">
-                                <div class="bg-white p-2 rounded-lg shadow-sm">📅</div>
-                                <p class="font-bold">2026年3月21日(土) <span class="text-gray-400">10:00-14:00</span></p>
-                            </div>
-                            <div class="flex gap-4 items-center">
-                                <div class="bg-white p-2 rounded-lg shadow-sm">📍</div>
-                                <p class="font-bold leading-tight">健康センターセレネ広場<br><span class="text-xs text-gray-400">（アンパンマンミュージアム横）</span></p>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-2xl border-2 border-dashed border-gray-200 text-center font-bold text-nagi-green italic">
-                            当日、このページを<br>「合言葉」と一緒に見せてね！🎁
-                        </div>
-                    </div>
+            <!-- 投稿ゲーム特典 -->
+            <div class="bg-blue-50 border-2 border-blue-100 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-extrabold text-nagi-blue mb-2">🎮 投稿ゲーム特典（200円引き）</h3>
+                <p class="text-[12px] text-gray-600 font-bold leading-relaxed">
+                    SNSやこのページの「棒キャッチゲーム」で成功すると、<br>
+                    「ゲーム成功スタンプ」が押されて<br>
+                    <span class="text-gray-800 underline decoration-blue-400 decoration-2">200円引き</span>が適用されます。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- お得な併用例セクション（追加分） -->
+    <section class="py-6 bg-white px-4">
+        <div class="max-w-md mx-auto text-center space-y-4 text-[12px] font-bold text-gray-700 leading-relaxed">
+            <p class="bg-yellow-50 border border-yellow-300 rounded-xl p-4">
+                🌟 <span class="text-yellow-700 font-extrabold">実はかなりお得！</span><br>
+                3,000円のバッグなら、<br>
+                来場特典500円引き＋ゲーム特典200円引きで<br>
+                <span class="text-gray-900 text-lg font-extrabold">→ 2,300円に！</span>
+            </p>
+
+            <p class="text-gray-600">
+                来場スタンプは <span class="font-extrabold text-gray-900 underline decoration-green-200 decoration-2">3,000円以上のPPバンドバッグ</span> に使えます。<br>
+                投稿ゲーム特典（200円引き）は <span class="font-extrabold text-gray-900 underline decoration-blue-200 decoration-2">すべてのバッグに適用OK</span>。<br>
+                もちろん併用できるき、最大 <span class="text-gray-900 font-extrabold">700円引き</span> になります。
+            </p>
+
+            <p class="text-[10px] text-gray-400 italic">
+                ※ お会計時にこの画面をご提示ください
+            </p>
+        </div>
+    </section>
+
+    <!-- 当日リアル落下棒ゲーム -->
+    <section class="py-12 bg-blue-50 px-4">
+        <div class="max-w-md mx-auto text-center space-y-4">
+            <h2 class="text-lg font-extrabold text-gray-800 tracking-wider">
+                🎉 当日限定・リアル落下棒ゲーム
+            </h2>
+            <p class="text-[12px] text-gray-600 font-bold leading-relaxed">
+                会場に実物の<span class="text-nagi-green font-black">「リアル落下棒」</span>が登場予定！<br>
+                成功した方には素敵な粗品をプレゼントします。
+            </p>
+            <div class="bg-white/50 p-4 rounded-xl text-[11px] text-gray-500 font-bold grid grid-cols-2 gap-2">
+                <span>🎁 キャラボールペン</span>
+                <span>🎁 ブレスレット</span>
+                <span>🎁 ミニ懐中電灯</span>
+                <span>🎁 飴玉・キーホルダー</span>
+            </div>
+            <p class="text-[9px] text-gray-400 font-bold">※ 会場の状況により内容が変更になる場合があります</p>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-xl font-bold text-gray-800 mb-8 tracking-[0.2em] uppercase">Event Info</h2>
+            <div class="inline-block bg-nagi-bg p-8 rounded-[2rem] border-4 border-white shadow-lg space-y-6">
+                <div>
+                    <p class="text-xs text-nagi-green font-black uppercase mb-1 tracking-widest">Date</p>
+                    <p class="font-bold text-gray-700">2026年3月21日(土) 10:00-14:00</p>
+                </div>
+                <div>
+                    <p class="text-xs text-nagi-green font-black uppercase mb-1 tracking-widest">Location</p>
+                    <p class="font-bold text-gray-700 leading-relaxed">
+                        健康センターセレネ広場<br>
+                        <span class="text-xs text-gray-400 font-normal underline decoration-gray-100 italic">（アンパンマンミュージアム横）</span>
+                    </p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <footer class="bg-gray-800 text-white py-12 text-center">
-            <p class="font-bold text-xl mb-2 tracking-widest italic">凪 -nagi-</p>
-            <p class="text-gray-500 text-[10px] uppercase font-bold">Member Only Site</p>
-        </footer>
-    </div>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12 text-center">
+        <p class="font-bold text-xl mb-2 tracking-widest italic">凪 -nagi-</p>
+        <p class="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Stamp & Game Special Page</p>
+    </footer>
 
-    <script>
-        // --- 合言葉の設定 ---
-        const SECRET_WORD = "nagi"; // ← ここを好きな言葉に変えられます
+</div> <!-- protected-content end -->
 
-        function checkPassword() {
-            const input = document.getElementById('pass-input').value;
-            const error = document.getElementById('error-msg');
-            const screen = document.getElementById('password-screen');
-            const content = document.getElementById('protected-content');
+<script>
+    const SECRET_WORD = "nagi"; 
 
-            if (input === SECRET_WORD) {
-                screen.style.display = 'none';
-                content.style.display = 'block';
-                window.scrollTo(0, 0);
-            } else {
-                error.classList.remove('hidden');
-                // 入力欄を赤くフラッシュさせる演出
-                document.getElementById('pass-input').classList.add('border-red-300');
-                setTimeout(() => document.getElementById('pass-input').classList.remove('border-red-300'), 500);
+    function checkPassword() {
+        const input = document.getElementById('pass-input').value;
+        if (input.toLowerCase() === SECRET_WORD) {
+            document.getElementById('password-screen').style.display = 'none';
+            document.getElementById('protected-content').style.display = 'block';
+            window.scrollTo(0, 0);
+        } else {
+            document.getElementById('error-msg').classList.remove('hidden');
+        }
+    }
+
+    // スタンプ押印機能
+    function applyStamp(type) {
+        if(type === 'visit') {
+            document.getElementById('stamp-visit').classList.add('active');
+            document.getElementById('visit-btn').style.display = 'none';
+        } else if(type === 'game') {
+            document.getElementById('stamp-game').classList.add('active');
+            document.getElementById('game-status-text').innerText = "獲得済み！";
+            document.getElementById('coupon-area').classList.remove('hidden');
+        }
+    }
+
+    // 画像リトライ
+    const img = document.getElementById('main-photo');
+    const exts = ['jpg', 'JPG', 'png', 'jpeg'];
+    let extIdx = 0;
+    img.onerror = function() {
+        if (extIdx < exts.length) this.src = 'bag-photo.' + exts[extIdx++];
+    };
+
+    // カウントダウン
+    const eventDate = new Date('2026-03-21T10:00:00').getTime();
+    function updateCountdown() {
+        const distance = eventDate - new Date().getTime();
+        if (distance < 0) return;
+        document.getElementById("cd-days").innerText = Math.floor(distance / 86400000).toString().padStart(2, '0');
+        document.getElementById("cd-hours").innerText = Math.floor((distance % 86400000) / 3600000).toString().padStart(2, '0');
+        document.getElementById("cd-mins").innerText = Math.floor((distance % 3600000) / 60000).toString().padStart(2, '0');
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // ゲームロジック
+    const startBtn = document.getElementById('start-game-btn');
+    const stick = document.getElementById('falling-stick');
+    const resultDisplay = document.getElementById('game-result');
+    let gameInProgress = false;
+    let stickAnimation;
+
+    startBtn.onclick = () => {
+        if(gameInProgress) return;
+        gameInProgress = true;
+        resultDisplay.classList.add('hidden');
+        resultDisplay.classList.remove('success-glow');
+        startBtn.innerText = "集中...";
+        startBtn.disabled = true;
+        stick.style.display = 'none';
+        stick.style.top = '-150px';
+
+        setTimeout(() => {
+            stick.style.display = 'block';
+            void stick.offsetWidth;
+            stick.style.transition = 'top 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+            stick.style.top = '450px';
+            stickAnimation = setTimeout(() => endGame(false), 400);
+        }, Math.random() * 2000 + 1000);
+    };
+
+    const catchHandler = (e) => {
+        if(!gameInProgress) return;
+        e.preventDefault();
+        const currentTop = window.getComputedStyle(stick).top;
+        stick.style.transition = 'none';
+        stick.style.top = currentTop;
+        clearTimeout(stickAnimation);
+        endGame(true);
+    };
+    stick.onmousedown = catchHandler;
+    stick.ontouchstart = catchHandler;
+
+    function endGame(won) {
+        gameInProgress = false;
+        startBtn.disabled = false;
+        startBtn.innerText = won ? "成功！" : "もう一度！";
+        resultDisplay.classList.remove('hidden');
+
+        if(won) {
+            resultDisplay.innerHTML = "🎉 おめでとう！200円引きスタンプ獲得！";
+            resultDisplay.className = "mt-4 p-4 rounded-xl border font-bold text-green-800 bg-green-50 border-green-200 success-glow";
+            applyStamp('game');
+
+            const popup = document.getElementById('success-popup');
+            popup.classList.add('active');
+            setTimeout(() => popup.classList.remove('active'), 1500);
+
+            for (let i = 0; i < 40; i++) {
+                const conf = document.createElement("div");
+                conf.className = "confetti";
+                conf.style.left = Math.random() * 100 + "%";
+                conf.style.setProperty("--i", Math.random());
+                conf.style.animationDelay = Math.random() * 0.5 + "s";
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 2000);
             }
+        } else {
+            resultDisplay.innerHTML = "💦 惜しい！下まで落ちちゃった...";
+            resultDisplay.className = "mt-4 p-4 rounded-xl border font-bold text-red-800 bg-red-50 border-red-200";
         }
+    }
+</script>
 
-        // Enterキーでも送信できるようにする
-        document.getElementById('pass-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkPassword();
-        });
-
-        // 画像リトライ機能
-        const img = document.getElementById('main-photo');
-        const exts = ['jpg', 'JPG', 'png', 'jpeg'];
-        let extIdx = 0;
-        img.onerror = function() {
-            if (extIdx < exts.length) {
-                this.src = 'bag-photo.' + exts[extIdx++];
-            } else {
-                this.style.display = 'none';
-                document.getElementById('photo-error').classList.remove('hidden');
-            }
-        };
-
-        // カウントダウン
-        const eventDate = new Date('2026-03-21T10:00:00').getTime();
-        function updateCountdown() {
-            const distance = eventDate - new Date().getTime();
-            if (distance < 0) return;
-            document.getElementById("cd-days").innerText = Math.floor(distance / 86400000).toString().padStart(2, '0');
-            document.getElementById("cd-hours").innerText = Math.floor((distance % 86400000) / 3600000).toString().padStart(2, '0');
-            document.getElementById("cd-mins").innerText = Math.floor((distance % 3600000) / 60000).toString().padStart(2, '0');
-        }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-
-        // ゲーム
-        const startBtn = document.getElementById('start-game-btn');
-        const stick = document.getElementById('falling-stick');
-        const resultDisplay = document.getElementById('game-result');
-        let gameInProgress = false;
-        let stickAnimation;
-
-        startBtn.onclick = () => {
-            if(gameInProgress) return;
-            gameInProgress = true;
-            resultDisplay.classList.add('hidden');
-            startBtn.innerText = "集中...";
-            startBtn.disabled = true;
-            stick.style.display = 'none';
-            stick.style.top = '-100px';
-
-            setTimeout(() => {
-                stick.style.display = 'block';
-                void stick.offsetWidth;
-                stick.style.transition = 'top 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
-                stick.style.top = '450px';
-                stickAnimation = setTimeout(() => endGame(false), 500);
-            }, Math.random() * 2000 + 1000);
-        };
-
-        const catchHandler = (e) => {
-            if(!gameInProgress) return;
-            e.preventDefault();
-            const currentTop = window.getComputedStyle(stick).top;
-            stick.style.transition = 'none';
-            stick.style.top = currentTop;
-            clearTimeout(stickAnimation);
-            endGame(true);
-        };
-        stick.onmousedown = catchHandler;
-        stick.ontouchstart = catchHandler;
-
-        function endGame(won) {
-            gameInProgress = false;
-            startBtn.disabled = false;
-            startBtn.innerText = "もう一度！";
-            resultDisplay.classList.remove('hidden');
-            resultDisplay.innerHTML = won ? "🎉 ナイスキャッチ！" : "💦 惜しい！";
-            resultDisplay.className = `mt-4 p-4 rounded-xl border font-bold ${won ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-        }
-    </script>
 </body>
 </html>

@@ -6,7 +6,7 @@
     <title>凪 -nagi- | びらふ マルシェ特設サイト</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- 紙吹雪ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -35,7 +35,7 @@
         body { background-color: #FFFDF9; color: #374151; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
 
         /* スタンプアニメーション */
-        .stamp-base { opacity: 0; transition: opacity 0.5s; background: white; }
+        .stamp-base { opacity: 0; transition: opacity 0.5s; background: white; pointer-events: none; }
         .stamp-base.active { opacity: 0.9; animation: stamp-anim 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
         .stamp-nagi-round {
@@ -61,175 +61,111 @@
         @keyframes bag-swing { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(10deg); } }
         .bag-animation { animation: bag-swing 2s ease-in-out infinite; transform-origin: top center; }
 
-        /* 手話アニメーション（こんにちは：額から指を下ろす動きのデフォルメ） */
-        @keyframes sign-hello { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
-        .sign-hand { animation: sign-hello 1.5s ease-in-out infinite; }
+        /* 手話アニメーション */
+        .sign-cat-head { transform-origin: 70px 55px; animation: signHeadBow 6s infinite; }
+        .sign-hello-group { opacity: 1; animation: showHello 6s infinite; }
+        @keyframes showHello { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .sign-thanks-group { opacity: 0; animation: showThanks 6s infinite; }
+        @keyframes showThanks { 0%, 49% { opacity: 0; } 50%, 100% { opacity: 1; } }
+
+        .hello-hand-left  { transform-origin: 50px 108px; animation: helloHandLeft 6s infinite; }
+        .hello-hand-right { transform-origin: 90px 108px; animation: helloHandRight 6s infinite; }
+
+        @keyframes helloHandLeft {
+            0%, 36%, 49%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+            12% { transform: translateX(3px) translateY(0) rotate(0deg); }
+            24% { transform: translateX(3px) translateY(6px) rotate(10deg); }
+        }
+        @keyframes helloHandRight {
+            0%, 36%, 49%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+            12% { transform: translateX(-3px) translateY(0) rotate(0deg); }
+            24% { transform: translateX(-3px) translateY(6px) rotate(-10deg); }
+        }
+
+        .thanks-hand-knife { transform-origin: 93px 110px; animation: thanksTap 6s infinite; }
+        @keyframes thanksTap { 0%, 55%, 66%, 100% { transform: translateX(0); } 60% { transform: translateX(-10px); } }
+
+        @keyframes signHeadBow {
+            0%, 34%, 60%, 82%, 100% { transform: rotate(0deg) translateY(0); }
+            22% { transform: rotate(8deg) translateY(2px); }
+            70% { transform: rotate(10deg) translateY(3px); }
+        }
+
+        .thanks-sparkle { transform-origin: 70px 98px; opacity: 0; animation: thanksSparkle 6s infinite; }
+        @keyframes thanksSparkle {
+            0%, 54%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+            60% { opacity: 1; transform: scale(1) rotate(0deg); }
+            66% { opacity: 0; transform: scale(1.4) rotate(20deg); }
+        }
 
         .bg-dots { background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 20px 20px; }
-
         html { scroll-behavior: smooth; }
 
         /* 画像プレースホルダ */
         .img-placeholder {
-            background: #f3f4f6;
-            border: 2px dashed #d1d5db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #9ca3af;
-            font-size: 0.75rem;
-            border-radius: 1rem;
-            overflow: hidden;
+            background: #f3f4f6; border: 2px dashed #d1d5db;
+            display: flex; align-items: center; justify-content: center;
+            color: #9ca3af; font-size: 0.875rem; border-radius: 1rem; overflow: hidden;
+            width: 100%; height: 100%; min-height: 200px;
         }
 
-        /* ===== ここから：ゲーム追加演出CSS ===== */
-
-        /* フラッシュ */
+        /* ゲーム演出 CSS */
         .flash-overlay{
-            position:absolute;
-            inset:0;
-            border-radius:3rem;
+            position:absolute; inset:0; border-radius:3rem;
             background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.95), rgba(255,255,255,0) 60%);
-            pointer-events:none;
-            opacity:0;
-            z-index:60;
+            pointer-events:none; opacity:0; z-index:60;
         }
-        @keyframes nagi-flash{
-            0%{opacity:0; transform:scale(0.98);}
-            15%{opacity:1; transform:scale(1);}
-            100%{opacity:0; transform:scale(1.02);}
-        }
+        @keyframes nagi-flash{ 0%{opacity:0; transform:scale(0.98);} 15%{opacity:1; transform:scale(1);} 100%{opacity:0; transform:scale(1.02);} }
         .flash-overlay.active{ animation: nagi-flash 420ms ease-out; }
 
-        @keyframes mega-flash{ 0%{opacity:0;} 18%{opacity:1;} 100%{opacity:0;} }
-        .flash-overlay.mega{ animation: mega-flash 520ms ease-out; }
-
-        /* シェイク */
-        @keyframes nagi-shake{
-            0%{transform:translateX(0) rotate(0deg);}
-            20%{transform:translateX(-3px) rotate(-0.6deg);}
-            40%{transform:translateX(3px) rotate(0.6deg);}
-            60%{transform:translateX(-2px) rotate(-0.4deg);}
-            80%{transform:translateX(2px) rotate(0.4deg);}
-            100%{transform:translateX(0) rotate(0deg);}
-        }
-        .shake{ animation:nagi-shake 260ms linear; }
-
-        /* 棒グロー */
-        @keyframes nagi-glow{
-            0%{box-shadow:0 0 0 rgba(96,165,250,0);}
-            50%{box-shadow:0 0 28px rgba(96,165,250,0.75);}
-            100%{box-shadow:0 0 0 rgba(96,165,250,0);}
-        }
-        .glow{ animation:nagi-glow 500ms ease-out; }
-
-        /* 落下メーター */
         #fall-meter{
-            position:absolute;
-            top:16px; right:16px; bottom:16px;
-            width:10px;
-            border-radius:999px;
-            background: rgba(0,0,0,0.06);
-            z-index:12;
-            overflow:hidden;
-            pointer-events:none;
+            position:absolute; top:16px; right:16px; bottom:16px; width:10px;
+            border-radius:999px; background: rgba(0,0,0,0.06); z-index:12; overflow:hidden; pointer-events:none;
         }
         #fall-meter-fill{
-            position:absolute;
-            left:0; right:0; bottom:0;
-            height:0%;
-            background: rgba(96,165,250,0.35);
-            border-radius:999px;
+            position:absolute; left:0; right:0; bottom:0; height:0%;
+            background: rgba(96,165,250,0.35); border-radius:999px; transition: height 0.1s linear;
         }
-        #fall-meter-dot{
-            position:absolute;
-            left:50%;
-            transform:translateX(-50%);
-            width:14px; height:14px;
-            border-radius:999px;
-            background:#60A5FA;
-            box-shadow:0 6px 14px rgba(0,0,0,0.14);
-            bottom:0%;
-        }
-
-        /* 棒内ヒットマーカー */
         #hit-marker{
-            position:absolute;
-            left:50%;
-            transform:translateX(-50%);
-            width:16px; height:16px;
-            border-radius:999px;
-            background: rgba(255,255,255,0.92);
-            border:2px solid #f97316;
-            box-shadow:0 10px 20px rgba(0,0,0,0.15);
-            display:none;
-            pointer-events:none;
+            position:absolute; left:50%; transform:translateX(-50%); top: 50%;
+            width:20px; height:20px; border-radius:999px; background: rgba(255,255,255,0.92);
+            border:3px solid #f97316; box-shadow:0 10px 20px rgba(0,0,0,0.15); display:none; pointer-events:none;
         }
 
-        /* ドンピシャ巨大バッジ */
         .perfect-bg{
-            background:
-                radial-gradient(circle at 50% 40%, rgba(255,255,255,0.92), rgba(255,255,255,0) 55%),
-                radial-gradient(circle at 20% 30%, rgba(96,165,250,0.35), rgba(255,255,255,0) 45%),
-                radial-gradient(circle at 80% 35%, rgba(251,191,36,0.35), rgba(255,255,255,0) 45%),
-                radial-gradient(circle at 50% 80%, rgba(249,115,22,0.25), rgba(255,255,255,0) 60%);
+            background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.92), rgba(255,255,255,0) 55%),
+                        radial-gradient(circle at 20% 30%, rgba(96,165,250,0.35), rgba(255,255,255,0) 45%),
+                        radial-gradient(circle at 80% 35%, rgba(251,191,36,0.35), rgba(255,255,255,0) 45%);
             opacity:0;
         }
-        @keyframes perfect-bg-in{
-            0%{opacity:0; transform:scale(0.98);}
-            20%{opacity:1;}
-            100%{opacity:0; transform:scale(1.02);}
-        }
+        @keyframes perfect-bg-in{ 0%{opacity:0;} 20%{opacity:1;} 100%{opacity:0;} }
         .perfect-bg.active{ animation: perfect-bg-in 900ms ease-out; }
 
         .perfect-badge{
-            width:min(280px, 85%);
-            background: rgba(255,255,255,0.92);
-            border-radius: 2.3rem;
-            padding: 18px 18px 16px;
-            text-align:center;
-            border:4px solid transparent;
-            background-clip: padding-box;
-            position:relative;
-            transform: translateY(14px) scale(0.9);
-            opacity:0;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.18);
+            width:min(280px, 85%); background: rgba(255,255,255,0.92); border-radius: 2.3rem;
+            padding: 18px; text-align:center; position:relative; opacity:0; box-shadow: 0 25px 60px rgba(0,0,0,0.18);
         }
-        .perfect-badge:before{
-            content:"";
-            position:absolute;
-            inset:-4px;
-            border-radius:2.4rem;
-            background: conic-gradient(from 180deg, #60A5FA, #A855F7, #F472B6, #FBBF24, #F97316, #4ADE80, #60A5FA);
-            z-index:-1;
-            filter: blur(0.2px);
-        }
-        .perfect-top{ font-weight:900; font-size:22px; letter-spacing:-0.02em; color:#111827; }
-        .perfect-sub{ margin-top:6px; font-weight:800; font-size:11px; color:#f97316; letter-spacing:0.12em; }
-
         @keyframes perfect-pop{
             0%{opacity:0; transform: translateY(18px) scale(0.86) rotate(-2deg);}
             55%{opacity:1; transform: translateY(0) scale(1.10) rotate(1deg);}
             100%{opacity:1; transform: translateY(0) scale(1.00) rotate(0deg);}
         }
-        .perfect-badge.active{ animation: perfect-pop 520ms cubic-bezier(.2,.95,.2,1); }
-
-        /* ===== ここまで：ゲーム追加演出CSS ===== */
+        .perfect-badge.active{ animation: perfect-pop 520ms cubic-bezier(.2,.95,.2,1) forwards; }
     </style>
 </head>
 
-<body class="antialiased font-sans bg-dots">
-<div id="app">
+<body class="antialiased font-sans bg-dots relative">
+
     <!-- 告知バナー -->
-    <div class="fixed top-0 left-0 w-full bg-nagi-red text-white text-[10px] py-1 text-center font-bold z-[70] shadow-md uppercase">
+    <div class="fixed top-0 left-0 w-full bg-nagi-red text-white text-xs py-1.5 text-center font-bold z-[70] shadow-md uppercase tracking-wider">
         お会計時にこの画面をスタッフに見せてにゃ！🌈
     </div>
 
     <!-- ナビ -->
-    <nav class="pt-8 bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-orange-100">
-        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-14">
-            <span class="text-xl font-black text-nagi-orange font-cute tracking-tighter">凪 -nagi-</span>
-            <div class="flex gap-4 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+    <nav class="pt-8 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-orange-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <span class="text-2xl font-black text-nagi-orange font-cute tracking-tighter hover:scale-105 transition-transform cursor-default">凪 -nagi-</span>
+            <div class="flex gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-gray-400 uppercase tracking-widest">
                 <a href="#items" class="hover:text-nagi-orange transition-colors">Items</a>
                 <a href="#rewards" class="hover:text-nagi-red transition-colors">Rewards</a>
                 <a href="#game" class="hover:text-nagi-blue transition-colors">Game</a>
@@ -238,99 +174,113 @@
     </nav>
 
     <!-- ヒーロー：おめかし三毛猫 -->
-    <header class="py-10 bg-white/50 text-center px-4">
-        <div class="max-w-xs mx-auto mb-6 px-4">
-            <div class="w-full h-48 img-placeholder shadow-lg border-4 border-white">
-                [画像挿入箇所1: メインイラスト/写真を挿入]
-            </div>
-        </div>
-
-        <div class="max-w-[180px] mx-auto mb-4 drop-shadow-xl relative">
-            <!-- SVG Cat -->
-            <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
-                <path class="cat-tail" d="M140,160 Q170,140 160,100" fill="none" stroke="#3d2b1f" stroke-width="10" stroke-linecap="round" />
-                <path d="M50,160 Q50,110 100,110 Q150,110 150,160 Q150,190 100,190 Q50,190 50,160" fill="white" stroke="#e5e7eb" />
-                <path d="M100,110 Q130,110 150,160 L100,160 Z" fill="#f97316" />
-                <path d="M50,160 Q50,110 80,110 L80,160 Z" fill="#3d2b1f" />
-                <g class="bag-animation">
-                    <rect x="135" y="145" width="40" height="35" rx="4" fill="#60A5FA" />
-                    <path d="M145,145 Q155,125 165,145" fill="none" stroke="#3d2b1f" stroke-width="3" />
-                </g>
-                <circle cx="150" cy="140" r="10" fill="white" stroke="#e5e7eb" />
-                <path d="M60,80 Q60,40 100,40 Q140,40 140,80 Q140,120 100,120 Q60,120 60,80" fill="white" stroke="#e5e7eb" />
-                <path d="M65,55 L75,35 L90,50 Z" fill="#3d2b1f" />
-                <path d="M135,55 L125,35 L110,50 Z" fill="#f97316" />
-                <g class="cat-eye"><circle cx="85" cy="80" r="5" fill="#3d2b1f" /><circle cx="115" cy="80" r="5" fill="#3d2b1f" /></g>
-                <line x1="70" y1="85" x2="50" y2="80" stroke="#3d2b1f" stroke-width="1.5" /><line x1="130" y1="85" x2="150" y2="80" stroke="#3d2b1f" stroke-width="1.5" />
-                <circle cx="92" cy="98" r="8" fill="white" stroke="#f3f4f6" /><circle cx="108" cy="98" r="8" fill="white" stroke="#f3f4f6" />
-                <path d="M96,102 Q100,106 104,102" fill="none" stroke="#3d2b1f" stroke-width="2" />
-                <path d="M97,93 L103,93 L100,97 Z" fill="#f87171" />
-            </svg>
-        </div>
-        <h1 class="text-3xl font-black text-gray-800 tracking-tighter mb-1">びらふ マルシェ</h1>
-        <p class="text-xs font-bold text-nagi-orange tracking-widest font-cute uppercase">Colorful Bag Exhibition</p>
-
-        <!-- イベント基本情報 -->
-        <div class="mt-8 grid grid-cols-1 gap-3 max-w-sm mx-auto text-left">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-orange-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <div>
-                    <p class="text-[9px] font-black text-gray-400 uppercase">Date</p>
-                    <p class="text-sm font-black text-gray-800">2026.3.21(土) <span class="text-nagi-orange ml-2">10:00 - 14:00</span></p>
+    <header class="py-12 md:py-20 bg-gradient-to-b from-white/60 to-transparent px-4">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+            
+            <!-- 左側：イラスト・アニメーション -->
+            <div class="w-full md:w-1/2 flex flex-col items-center relative">
+                <div class="w-full max-w-sm aspect-[4/3] img-placeholder shadow-xl border-4 border-white mb-8 md:mb-0 transform md:-rotate-2 hover:rotate-0 transition-transform duration-300">
+                    [画像挿入箇所1: メインイラスト/写真]
                 </div>
-                <div class="text-right">
-                    <p class="text-[9px] font-black text-gray-400 uppercase">Entrance</p>
-                    <p class="text-sm font-black text-gray-800">入場無料</p>
+                
+                <!-- SVG Cat (絶対配置で画像に重ねる等の装飾も可能ですが、今回は下に配置) -->
+                <div class="w-40 md:w-48 drop-shadow-2xl absolute -bottom-16 md:-bottom-12 md:-right-10 z-10">
+                    <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+                        <path class="cat-tail" d="M140,160 Q170,140 160,100" fill="none" stroke="#3d2b1f" stroke-width="10" stroke-linecap="round" />
+                        <path d="M50,160 Q50,110 100,110 Q150,110 150,160 Q150,190 100,190 Q50,190 50,160" fill="white" stroke="#e5e7eb" />
+                        <path d="M100,110 Q130,110 150,160 L100,160 Z" fill="#f97316" />
+                        <path d="M50,160 Q50,110 80,110 L80,160 Z" fill="#3d2b1f" />
+                        <g class="bag-animation">
+                            <rect x="135" y="145" width="40" height="35" rx="4" fill="#60A5FA" />
+                            <path d="M145,145 Q155,125 165,145" fill="none" stroke="#3d2b1f" stroke-width="3" />
+                        </g>
+                        <circle cx="150" cy="140" r="10" fill="white" stroke="#e5e7eb" />
+                        <path d="M60,80 Q60,40 100,40 Q140,40 140,80 Q140,120 100,120 Q60,120 60,80" fill="white" stroke="#e5e7eb" />
+                        <path d="M65,55 L75,35 L90,50 Z" fill="#3d2b1f" />
+                        <path d="M135,55 L125,35 L110,50 Z" fill="#f97316" />
+                        <g class="cat-eye"><circle cx="85" cy="80" r="5" fill="#3d2b1f" /><circle cx="115" cy="80" r="5" fill="#3d2b1f" /></g>
+                        <line x1="70" y1="85" x2="50" y2="80" stroke="#3d2b1f" stroke-width="1.5" /><line x1="130" y1="85" x2="150" y2="80" stroke="#3d2b1f" stroke-width="1.5" />
+                        <circle cx="92" cy="98" r="8" fill="white" stroke="#f3f4f6" /><circle cx="108" cy="98" r="8" fill="white" stroke="#f3f4f6" />
+                        <path d="M96,102 Q100,106 104,102" fill="none" stroke="#3d2b1f" stroke-width="2" />
+                        <path d="M97,93 L103,93 L100,97 Z" fill="#f87171" />
+                    </svg>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-orange-50">
-                <p class="text-[9px] font-black text-gray-400 uppercase">Place</p>
-                <p class="text-sm font-black text-gray-800 leading-tight">
-                    健康センターセレネ広場・<br class="sm:hidden">
-                    集落活動センター美良布 交流スペース
-                </p>
+
+            <!-- 右側：テキスト情報 -->
+            <div class="w-full md:w-1/2 text-center md:text-left mt-16 md:mt-0 z-20">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-800 tracking-tighter mb-2 md:mb-4">びらふ マルシェ</h1>
+                <p class="text-sm md:text-base font-bold text-nagi-orange tracking-widest font-cute uppercase mb-8 md:mb-12">Colorful Bag Exhibition</p>
+
+                <!-- イベント基本情報 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                    <div class="bg-white p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-orange-50 hover:shadow-lg transition-shadow">
+                        <p class="text-[10px] md:text-xs font-black text-gray-400 uppercase mb-1">Date & Time</p>
+                        <p class="text-base md:text-lg font-black text-gray-800">2026.3.21<span class="text-sm">(土)</span></p>
+                        <p class="text-lg md:text-xl font-black text-nagi-orange mt-1">10:00 - 14:00</p>
+                    </div>
+                    <div class="bg-white p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-md border border-orange-50 hover:shadow-lg transition-shadow flex flex-col justify-between">
+                        <div>
+                            <p class="text-[10px] md:text-xs font-black text-gray-400 uppercase mb-1">Entrance</p>
+                            <p class="text-base md:text-lg font-black text-gray-800 mb-3">入場無料</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] md:text-xs font-black text-gray-400 uppercase mb-1">Place</p>
+                            <p class="text-sm md:text-base font-bold text-gray-700 leading-snug">
+                                健康センターセレネ広場<br>
+                                <span class="text-xs md:text-sm text-gray-500">集落活動センター美良布 交流スペース</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- 商品紹介 -->
-    <section id="items" class="py-12 px-4 bg-white/30">
-        <div class="max-w-md mx-auto">
-            <h2 class="text-2xl font-black text-gray-800 mb-6 font-cute flex items-center gap-2">
-                <span class="w-2 h-8 bg-nagi-orange rounded-full"></span>
-                凪-nagi- バッグ
+    <section id="items" class="py-16 md:py-24 px-4 bg-white/40">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-10 font-cute flex items-center gap-3 justify-center md:justify-start">
+                <span class="w-2.5 h-10 bg-nagi-orange rounded-full"></span>
+                凪 -nagi- バッグ
             </h2>
 
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border-2 border-orange-100 mb-6">
-                <div class="w-full h-48 img-placeholder mb-4">
-                    [画像挿入箇所2: ここにバッグが並んだ写真を挿入]
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
+                <!-- 左側：バッグの説明 -->
+                <div class="md:col-span-3 bg-white rounded-[2.5rem] p-6 md:p-10 shadow-xl border-2 border-orange-100">
+                    <div class="w-full aspect-[16/9] img-placeholder mb-6 md:mb-8 rounded-2xl">
+                        [画像挿入箇所2: バッグが並んだ写真]
+                    </div>
+                    <p class="text-base md:text-lg font-bold text-gray-700 leading-relaxed mb-6">
+                        丈夫でカラフル。PPバンドを一つひとつ手編みしたバッグだにゃ。水洗いOK、丈夫で軽量。お買い物や温泉、ピクニックの相棒にぴったりだにゃん。
+                    </p>
+                    <div class="flex justify-between items-end border-t border-gray-100 pt-6">
+                        <span class="text-sm md:text-base font-black text-gray-400 uppercase tracking-widest">Price Range</span>
+                        <span class="text-4xl md:text-5xl font-black text-gray-800">¥500 <span class="text-xl md:text-2xl font-medium text-gray-400 mx-1">〜</span> ¥3,000</span>
+                    </div>
                 </div>
-                <p class="text-sm font-bold text-gray-700 leading-relaxed">
-                    丈夫でカラフル。PPバンドを一つひとつ手編みしたバッグだにゃ。水洗いOK、丈夫で軽量。お買い物や温泉、ピクニックの相棒にぴったりだにゃん。
-                </p>
-                <div class="mt-6 flex justify-between items-baseline">
-                    <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Price Range</span>
-                    <span class="text-3xl font-black text-gray-800">¥500 <span class="text-sm font-medium">〜</span> ¥3,000</span>
-                </div>
-            </div>
 
-            <!-- 割引シミュレーション -->
-            <div class="bg-gradient-to-br from-nagi-red/5 to-nagi-blue/5 rounded-[2rem] p-6 border border-white shadow-inner">
-                <h3 class="text-sm font-black text-gray-800 mb-3 flex items-center gap-2">
-                    🌟 実はかなりお得だにゃ！
-                </h3>
-                <div class="space-y-2 text-xs font-bold text-gray-600">
-                    <p>3,000円のバッグなら...</p>
-                    <div class="flex justify-between items-center bg-white/60 p-2 rounded-lg">
-                        <span>来場特典</span>
-                        <span class="text-nagi-red">- ¥500</span>
-                    </div>
-                    <div class="flex justify-between items-center bg-white/60 p-2 rounded-lg">
-                        <span>ゲーム特典</span>
-                        <span class="text-nagi-blue">- ¥200</span>
-                    </div>
-                    <div class="flex justify-between items-center pt-2 border-t border-dashed border-gray-300">
-                        <span class="text-sm">合計</span>
-                        <span class="text-xl font-black text-gray-800 tracking-tighter">→ ¥2,300</span>
+                <!-- 右側：割引シミュレーション -->
+                <div class="md:col-span-2">
+                    <div class="bg-gradient-to-br from-nagi-red/5 to-nagi-blue/5 rounded-[2.5rem] p-6 md:p-8 border-2 border-white shadow-xl h-full flex flex-col justify-center">
+                        <h3 class="text-lg md:text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+                            <span class="text-2xl">🌟</span> 実はかなりお得だにゃ！
+                        </h3>
+                        <div class="space-y-4 text-sm md:text-base font-bold text-gray-600">
+                            <p class="text-gray-800">例：3,000円のバッグなら...</p>
+                            <div class="flex justify-between items-center bg-white/80 p-3 md:p-4 rounded-xl shadow-sm">
+                                <span>来場特典</span>
+                                <span class="text-nagi-red text-lg md:text-xl">- ¥500</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/80 p-3 md:p-4 rounded-xl shadow-sm">
+                                <span>ゲーム特典</span>
+                                <span class="text-nagi-blue text-lg md:text-xl">- ¥200</span>
+                            </div>
+                            <div class="flex justify-between items-end pt-4 border-t-2 border-dashed border-gray-300 mt-4">
+                                <span class="text-base md:text-lg">合計</span>
+                                <span class="text-3xl md:text-4xl font-black text-gray-800 tracking-tighter">→ ¥2,300</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -338,111 +288,161 @@
     </section>
 
     <!-- 特典スタンプセクション -->
-    <section id="rewards" class="py-12 px-4">
-        <div class="max-w-md mx-auto space-y-6">
-            <h2 class="text-xl font-black text-gray-800 text-center mb-8 font-cute">当日限定！2大特典だにゃ</h2>
+    <section id="rewards" class="py-16 md:py-24 px-4">
+        <div class="max-w-5xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-black text-gray-800 text-center mb-12 font-cute">
+                当日限定！2大特典だにゃ
+            </h2>
 
-            <!-- 来場特典 -->
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border-b-8 border-nagi-red relative overflow-hidden group">
-                <div class="absolute -top-4 -right-4 w-20 h-20 bg-nagi-red/5 rounded-full"></div>
-                <div class="flex justify-between items-start">
-                    <div class="z-10 flex-1">
-                        <span class="inline-block bg-nagi-red text-white text-[9px] px-2 py-0.5 rounded-full font-black mb-2">来場特典</span>
-                        <h3 class="font-black text-lg text-gray-800">3,000円以上のバッグが<br><span class="text-2xl text-nagi-red">500円引き！</span></h3>
-                        <p class="text-[10px] text-gray-500 mt-2 font-bold leading-tight">「Instagramを見たよ！」と画面を提示してにゃ✨</p>
-                        <button onclick="applyStamp('visit')" id="visit-btn" class="mt-4 px-6 py-2.5 bg-nagi-red text-white text-[10px] rounded-full font-black shadow-lg active:scale-95 transition-all">スタッフに見せてポチッ！</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- 来場特典 -->
+                <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border-b-8 border-nagi-red relative overflow-hidden group">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-nagi-red/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="flex justify-between items-start h-full relative z-10">
+                        <div class="flex flex-col h-full justify-between">
+                            <div>
+                                <span class="inline-block bg-nagi-red text-white text-xs px-3 py-1 rounded-full font-black mb-4 shadow-sm">
+                                    来場特典
+                                </span>
+                                <h3 class="font-black text-xl md:text-2xl text-gray-800 leading-tight mb-3">
+                                    3,000円以上のバッグが<br>
+                                    <span class="text-3xl md:text-4xl text-nagi-red mt-1 inline-block">500円引き！</span>
+                                </h3>
+                                <p class="text-xs md:text-sm text-gray-500 font-bold leading-relaxed">
+                                    「Instagramを見たよ！」と画面を提示してにゃ✨
+                                </p>
+                            </div>
+                            <button onclick="applyStamp('visit')" id="visit-btn" class="mt-8 px-8 py-3 bg-nagi-red hover:bg-red-600 text-white text-sm md:text-base rounded-full font-black shadow-lg hover:shadow-xl active:scale-95 transition-all self-start w-full sm:w-auto text-center">
+                                スタッフに見せてポチッ！
+                            </button>
+                        </div>
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 md:relative md:top-auto md:transform-none">
+                            <div id="stamp-visit" class="stamp-base stamp-nagi-round shrink-0 shadow-sm bg-white/90 backdrop-blur-sm">凪</div>
+                        </div>
                     </div>
-                    <div id="stamp-visit" class="stamp-base stamp-nagi-round shrink-0">凪</div>
                 </div>
-            </div>
 
-            <!-- ゲーム特典 -->
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border-b-8 border-nagi-blue relative overflow-hidden group">
-                <div class="absolute -top-4 -right-4 w-20 h-20 bg-nagi-blue/5 rounded-full"></div>
-                <div class="flex justify-between items-start">
-                    <div class="z-10 flex-1">
-                        <span class="inline-block bg-nagi-blue text-white text-[9px] px-2 py-0.5 rounded-full font-black mb-2">ゲーム成功特典</span>
-                        <h3 class="font-black text-lg text-gray-800">すべてのバッグに使える<br><span class="text-2xl text-nagi-blue">200円引き！</span></h3>
-                        <p class="text-[10px] text-gray-500 mt-2 font-bold leading-tight">3,000円以上の商品なら500円引と併用OKだにゃん！</p>
-                    </div>
-                    <div id="stamp-game" class="stamp-base stamp-win shrink-0">
-                        <span class="text-[14px]">WIN!</span>
-                        <span class="text-[10px]">200円引</span>
+                <!-- ゲーム特典 -->
+                <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border-b-8 border-nagi-blue relative overflow-hidden group">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-nagi-blue/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="flex justify-between items-start h-full relative z-10">
+                        <div class="flex flex-col h-full justify-center">
+                            <div>
+                                <span class="inline-block bg-nagi-blue text-white text-xs px-3 py-1 rounded-full font-black mb-4 shadow-sm">
+                                    ゲーム成功特典
+                                </span>
+                                <h3 class="font-black text-xl md:text-2xl text-gray-800 leading-tight mb-3">
+                                    すべてのバッグに使える<br>
+                                    <span class="text-3xl md:text-4xl text-nagi-blue mt-1 inline-block">200円引き！</span>
+                                </h3>
+                                <p class="text-xs md:text-sm text-gray-500 font-bold leading-relaxed">
+                                    下のゲームに挑戦！3,000円以上の商品なら500円引と併用OKだにゃん！
+                                </p>
+                            </div>
+                        </div>
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 md:relative md:top-auto md:transform-none pl-4">
+                            <div id="stamp-game" class="stamp-base stamp-win shrink-0 shadow-sm bg-white/90 backdrop-blur-sm">
+                                <span class="text-lg md:text-xl">WIN!</span>
+                                <span class="text-xs md:text-sm">200円引</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- 手話特典 -->
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border-b-8 border-nagi-purple relative overflow-hidden">
-                <div class="absolute -top-4 -right-4 w-24 h-24 bg-nagi-purple/5 rounded-full"></div>
-                <div class="flex items-center gap-4">
-                    <div class="z-10 flex-1">
-                        <span class="inline-block bg-nagi-purple text-white text-[9px] px-2 py-0.5 rounded-full font-black mb-2">手話特典</span>
-                        <h3 class="font-black text-sm text-gray-800 leading-snug">
-                            スタッフに<span class="text-nagi-purple">”こんにちは”</span>と手話で挨拶してくださった方にはプレゼントを差し上げます✨
+            <div class="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-xl border-b-8 border-nagi-purple relative overflow-hidden mb-8">
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-nagi-purple/5 rounded-full"></div>
+                <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                    <div class="flex-1 order-2 md:order-1">
+                        <span class="inline-block bg-nagi-purple text-white text-xs px-3 py-1 rounded-full font-black mb-4 shadow-sm">手話特典</span>
+                        <h3 class="font-black text-base md:text-lg text-gray-800 leading-loose">
+                            スタッフに手話で「こんにちは」や「ありがとう」とごあいさつしてみてにゃ✨<br class="hidden md:block">
+                            はじめてでも見よう見まねでOK、正解・不正解より“伝えたい気持ち”が大事だにゃん。<br class="hidden md:block">
+                            その一瞬のやりとりを記念に、ささやかなプレゼントをさしあげるにゃ🐾
                         </h3>
                     </div>
-                    <div class="w-20 h-24 shrink-0 relative">
-                        <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="50" cy="50" r="35" fill="white" stroke="#e5e7eb" stroke-width="2"/>
-                            <path d="M25,30 L35,15 L45,30 Z" fill="#3d2b1f" />
-                            <path d="M75,30 L65,15 L55,30 Z" fill="#f97316" />
-                            <circle cx="40" cy="50" r="3" fill="#3d2b1f" />
-                            <circle cx="60" cy="50" r="3" fill="#3d2b1f" />
-                            <circle cx="47" cy="58" r="4" fill="white" stroke="#f3f4f6" />
-                            <circle cx="53" cy="58" r="4" fill="white" stroke="#f3f4f6" />
-                            <g class="sign-hand">
-                                <circle cx="50" cy="85" r="10" fill="#fbcfe8" stroke="#f472b6" stroke-width="2"/>
-                                <path d="M50,85 L50,105" stroke="#f472b6" stroke-width="4" stroke-linecap="round"/>
+                    <div class="w-32 h-40 md:w-40 md:h-48 shrink-0 relative order-1 md:order-2">
+                        <svg viewBox="0 0 140 160" class="w-full h-full drop-shadow-md" xmlns="http://www.w3.org/2000/svg" aria-label="手話アニメーション">
+                            <g class="sign-cat-head">
+                                <circle cx="70" cy="55" r="36" fill="white" stroke="#e5e7eb" stroke-width="3"/>
+                                <path d="M44,40 L52,22 L64,38 Z" fill="#3d2b1f"/>
+                                <path d="M96,40 L88,22 L76,38 Z" fill="#f97316"/>
+                                <circle cx="58" cy="55" r="3.2" fill="#3d2b1f"/>
+                                <circle cx="82" cy="55" r="3.2" fill="#3d2b1f"/>
+                                <path d="M66,66 Q70,70 74,66" fill="none" stroke="#3d2b1f" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M68,62 L72,62 L70,65 Z" fill="#f87171"/>
+                            </g>
+                            <g class="sign-hello-group">
+                                <g class="hello-hand-left"><circle cx="50" cy="108" r="11" fill="#fbcfe8" stroke="#f472b6" stroke-width="2"/><path d="M50,96 L50,78" stroke="#f472b6" stroke-width="5" stroke-linecap="round"/></g>
+                                <g class="hello-hand-right"><circle cx="90" cy="108" r="11" fill="#fbcfe8" stroke="#f472b6" stroke-width="2"/><path d="M90,96 L90,78" stroke="#f472b6" stroke-width="5" stroke-linecap="round"/></g>
+                                <text x="70" y="148" text-anchor="middle" font-size="14" font-weight="900" fill="#a855f7">こんにちは</text>
+                            </g>
+                            <g class="sign-thanks-group">
+                                <g class="thanks-hand-back"><rect x="44" y="98" width="36" height="22" rx="11" fill="#fbcfe8" stroke="#f472b6" stroke-width="2"/></g>
+                                <g class="thanks-hand-knife"><rect x="86" y="94" width="14" height="34" rx="7" fill="#fbcfe8" stroke="#f472b6" stroke-width="2"/></g>
+                                <g class="thanks-sparkle">
+                                    <path d="M70 104 L70 92" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M64 98 L76 98" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                                    <path d="M66 94 L74 102" stroke="#fde68a" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M74 94 L66 102" stroke="#fde68a" stroke-width="2" stroke-linecap="round"/>
+                                </g>
+                                <text x="70" y="148" text-anchor="middle" font-size="14" font-weight="900" fill="#f97316">ありがとう</text>
                             </g>
                         </svg>
-                        <div class="absolute bottom-0 left-0 right-0 text-center text-[8px] font-black text-nagi-purple bg-white/80 rounded">こんにちは♪</div>
+                        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-center text-[10px] md:text-xs font-black text-gray-500 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm whitespace-nowrap">
+                            まねっこOK♪
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="p-4 bg-orange-50 rounded-2xl border-2 border-orange-100 text-[10px] font-bold text-gray-500 space-y-1">
-                <p>※ 来場スタンプは3,000円以上のバッグにのみ適用だにゃ。</p>
-                <p>※ ゲーム成功スタンプはすべてのバッグで使えるにゃ。</p>
-                <p>※ 3,000円以上のバッグのみ、2つの特典の併用が可能だにゃん（最大700円引）。</p>
+            <!-- 注意書き -->
+            <div class="p-6 bg-orange-50/80 backdrop-blur-sm rounded-3xl border-2 border-orange-100 text-xs md:text-sm font-bold text-gray-600 space-y-2 leading-relaxed">
+                <p class="flex items-start gap-2"><span class="text-nagi-orange">※</span> 来場スタンプは3,000円以上のバッグにのみ適用だにゃ。</p>
+                <p class="flex items-start gap-2"><span class="text-nagi-orange">※</span> ゲーム成功スタンプはすべてのバッグで使えるにゃ。</p>
+                <p class="flex items-start gap-2"><span class="text-nagi-orange">※</span> 3,000円以上のバッグのみ、2つの特典の併用が可能だにゃん（最大700円引）。</p>
             </div>
         </div>
     </section>
 
     <!-- リアルゲーム告知 -->
-    <section class="py-12 px-4 bg-white/60">
-        <div class="max-w-md mx-auto bg-white rounded-[3rem] p-8 shadow-2xl border-4 border-dashed border-nagi-yellow relative">
-            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-nagi-yellow text-white px-6 py-2 rounded-full font-black shadow-lg whitespace-nowrap">🎉 当日限定・リアル落下棒</div>
+    <section class="py-16 md:py-24 px-4 bg-white/60 border-y border-dashed border-gray-200">
+        <div class="max-w-4xl mx-auto bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border-4 border-dashed border-nagi-yellow relative mt-6">
+            <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-nagi-yellow text-white px-8 py-3 rounded-full font-black shadow-xl whitespace-nowrap text-sm md:text-base flex items-center gap-2 transform hover:scale-105 transition-transform">
+                <span class="text-xl">🎉</span> 当日限定・リアル落下棒
+            </div>
 
-            <div class="text-center mt-4">
-                <p class="text-sm font-black text-gray-700 leading-relaxed mb-6">
-                    会場に実物の「リアル落下棒」が登場するにゃ！<br>成功した方には素敵な粗品をプレゼントするにゃん。
+            <div class="text-center mt-6">
+                <p class="text-base md:text-lg font-black text-gray-700 leading-relaxed mb-8">
+                    会場に実物の「リアル落下棒」が登場するにゃ！<br class="hidden md:block">
+                    見事キャッチ成功した方には、素敵な粗品をプレゼントするにゃん🎁
                 </p>
 
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="bg-orange-50 p-3 rounded-2xl flex flex-col items-center">
-                        <span class="text-2xl mb-1">🖊️</span>
-                        <span class="text-[10px] font-black text-gray-600">キャラボールペン</span>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+                    <div class="bg-orange-50 p-4 rounded-3xl flex flex-col items-center justify-center aspect-square shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-4xl mb-3 drop-shadow-sm">🖊️</span>
+                        <span class="text-xs md:text-sm font-black text-gray-600 text-center">キャラボールペン</span>
                     </div>
-                    <div class="bg-orange-50 p-3 rounded-2xl flex flex-col items-center">
-                        <span class="text-2xl mb-1">📿</span>
-                        <span class="text-[10px] font-black text-gray-600">ブレスレット</span>
+                    <div class="bg-orange-50 p-4 rounded-3xl flex flex-col items-center justify-center aspect-square shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-4xl mb-3 drop-shadow-sm">📿</span>
+                        <span class="text-xs md:text-sm font-black text-gray-600 text-center">ブレスレット</span>
                     </div>
-                    <div class="bg-orange-50 p-3 rounded-2xl flex flex-col items-center">
-                        <span class="text-2xl mb-1">🔦</span>
-                        <span class="text-[10px] font-black text-gray-600">ミニ懐中電灯</span>
+                    <div class="bg-orange-50 p-4 rounded-3xl flex flex-col items-center justify-center aspect-square shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-4xl mb-3 drop-shadow-sm">🔦</span>
+                        <span class="text-xs md:text-sm font-black text-gray-600 text-center">ミニ懐中電灯</span>
                     </div>
-                    <div class="bg-orange-50 p-3 rounded-2xl flex flex-col items-center">
-                        <span class="text-2xl mb-1">🍬</span>
-                        <span class="text-[10px] font-black text-gray-600">飴玉・キーホルダー</span>
+                    <div class="bg-orange-50 p-4 rounded-3xl flex flex-col items-center justify-center aspect-square shadow-sm hover:shadow-md transition-shadow">
+                        <span class="text-4xl mb-3 drop-shadow-sm">🍬</span>
+                        <span class="text-xs md:text-sm font-black text-gray-600 text-center">飴玉・キーホルダー</span>
                     </div>
                 </div>
 
-                <div class="w-full h-32 img-placeholder mb-4">
+                <div class="w-full h-48 md:h-64 img-placeholder mb-6 rounded-2xl shadow-inner bg-gray-50 border-gray-200">
                     [画像挿入箇所3: 景品の写真を挿入]
                 </div>
 
-                <p class="text-[9px] font-bold text-gray-400 leading-tight">
+                <p class="text-xs md:text-sm font-bold text-gray-400 leading-tight">
                     ※ 当日会場の状況により内容が変更になる場合がありますにゃ。
                 </p>
             </div>
@@ -450,561 +450,401 @@
     </section>
 
     <!-- 落下棒ゲーム練習 -->
-    <section id="game" class="py-16 text-center px-4 bg-dots">
-        <div class="mb-8">
-            <h2 class="text-2xl font-black text-gray-800 mb-2 font-cute">スマホで予行演習だにゃ！</h2>
-            <p class="text-xs text-nagi-red font-black uppercase tracking-widest mb-1">難易度アップ中 🔥</p>
-            <p class="text-xs text-gray-500 font-bold">成功画面を当日見せても200円引になるにゃ！</p>
-        </div>
-
-        <!-- ★ここが「全提案反映済み」ゲームエリア -->
-        <div id="game-area" class="relative w-full max-w-[320px] h-[400px] bg-white mx-auto rounded-[3rem] border-[10px] border-white shadow-2xl overflow-hidden touch-none cursor-crosshair">
-            <div class="absolute inset-0 bg-blue-50/30"></div>
-
-            <!-- フラッシュ -->
-            <div id="flash" class="flash-overlay"></div>
-
-            <!-- 落下メーター -->
-            <div id="fall-meter" aria-hidden="true">
-                <div id="fall-meter-fill"></div>
-                <div id="fall-meter-dot"></div>
+    <section id="game" class="py-20 md:py-32 text-center px-4 bg-dots">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20">
+            
+            <div class="md:w-1/2 text-center md:text-left">
+                <h2 class="text-3xl md:text-5xl font-black text-gray-800 mb-4 font-cute leading-tight">スマホで<br class="hidden md:block">予行演習だにゃ！</h2>
+                <div class="inline-flex items-center gap-2 bg-red-50 text-nagi-red px-4 py-2 rounded-full mb-4">
+                    <span class="text-xl">🔥</span>
+                    <span class="text-sm md:text-base font-black uppercase tracking-widest">難易度アップ中</span>
+                </div>
+                <p class="text-sm md:text-base text-gray-600 font-bold mb-8 leading-relaxed">
+                    画面上から落ちてくる棒を、タイミングよくタップしてつかむにゃ！<br>
+                    <span class="text-nagi-blue font-black bg-blue-50 px-2 py-1 rounded inline-block mt-2">成功画面を当日見せても200円引になるにゃ！</span>
+                </p>
+                
+                <button id="start-btn" onclick="startGame()" class="px-10 py-4 md:px-14 md:py-5 bg-gradient-to-r from-nagi-blue to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-black rounded-full shadow-xl hover:shadow-2xl text-lg md:text-xl active:scale-95 transition-all transform hover:-translate-y-1">
+                    練習スタートだにゃ！
+                </button>
             </div>
 
-            <!-- ドンピシャ専用オーバーレイ -->
-            <div id="perfect-overlay" class="pointer-events-none absolute inset-0 hidden z-[65]">
-                <div class="absolute inset-0 perfect-bg"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div id="perfect-badge" class="perfect-badge">
-                        <div class="perfect-top">🎆 ドンピシャ！！ 🎆</div>
-                        <div class="perfect-sub">神業キャッチだにゃん✨</div>
+            <!-- ゲームエリア (モックアップ風) -->
+            <div class="md:w-1/2 flex justify-center w-full">
+                <div class="relative w-full max-w-[340px] h-[500px] bg-white rounded-[3rem] border-[12px] border-gray-800 shadow-2xl overflow-hidden touch-none cursor-crosshair ring-4 ring-white ring-offset-4 ring-offset-blue-100">
+                    <!-- カメラホール -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-800 rounded-b-3xl z-[60]"></div>
+
+                    <div id="game-area" class="absolute inset-0 bg-gradient-to-b from-blue-50 to-blue-100/50" onclick="catchStick()">
+                        <!-- フラッシュ -->
+                        <div id="flash" class="flash-overlay"></div>
+
+                        <!-- 落下メーター -->
+                        <div id="fall-meter" aria-hidden="true">
+                            <div id="fall-meter-fill"></div>
+                        </div>
+
+                        <!-- ドンピシャ専用オーバーレイ -->
+                        <div id="perfect-overlay" class="pointer-events-none absolute inset-0 hidden z-[65]">
+                            <div class="absolute inset-0 perfect-bg"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div id="perfect-badge" class="perfect-badge">
+                                    <div class="font-black text-xl md:text-2xl text-gray-900 mb-1">🎆 ドンピシャ 🎆</div>
+                                    <div class="font-bold text-xs text-nagi-orange tracking-widest">神業キャッチだにゃん✨</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 落下棒 -->
+                        <div id="falling-stick" class="absolute top-[-200px] left-1/2 -translate-x-1/2 w-8 h-48 bg-gradient-to-b from-nagi-red via-nagi-yellow to-nagi-blue rounded-full shadow-xl border-2 border-white hidden z-20">
+                            <!-- キャッチ判定エリアの視覚的ガイド (中央付近) -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-12 border-y-2 border-white/50 bg-white/20"></div>
+                            <div id="hit-marker"></div>
+                        </div>
+
+                        <!-- 結果メッセージ -->
+                        <div id="game-message" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-50 bg-white/40 backdrop-blur-sm">
+                            <div id="game-result-box" class="bg-white p-6 md:p-8 rounded-[2rem] shadow-2xl border-4 border-nagi-blue text-center transform scale-90 transition-transform duration-300">
+                                <p id="game-result-icon" class="text-5xl md:text-6xl mb-4">🎯</p>
+                                <p id="game-result-title" class="text-lg md:text-xl font-black text-gray-800 mb-2">ナイスキャッチ！</p>
+                                <p id="game-result-desc" class="text-xs md:text-sm font-bold text-nagi-blue">特典スタンプ獲得だにゃん！</p>
+                                <button onclick="resetGame()" class="mt-6 px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-full transition-colors pointer-events-auto">もう一度</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- 落下棒 -->
-            <div id="falling-stick" class="absolute top-[-180px] left-1/2 -translate-x-1/2 w-10 h-40 bg-gradient-to-b from-nagi-red via-nagi-yellow to-nagi-blue rounded-full shadow-xl border-2 border-white hidden z-20">
-                <div id="hit-marker"></div>
-            </div>
-
-            <div id="game-message" class="absolute inset-0 flex items-center justify-center opacity-0 pointer-events-none transition-all z-50">
-                <div id="game-result-box" class="bg-white p-8 rounded-[2.5rem] shadow-2xl border-4 border-nagi-blue text-center scale-90">
-                    <p id="game-result-icon" class="text-4xl mb-2 animate-bounce">🎯</p>
-                    <p id="game-result-title" class="text-lg font-black text-gray-800">ナイスキャッチだにゃ！</p>
-                    <p id="game-result-desc" class="text-[10px] font-bold text-nagi-blue">特典スタンプ獲得だにゃん！</p>
-                </div>
-            </div>
         </div>
-
-        <button id="start-btn" class="mt-8 px-12 py-5 bg-nagi-blue text-white font-black rounded-full shadow-xl text-lg active:scale-95 transition-all">練習スタートだにゃ！</button>
     </section>
 
     <!-- AI相談室 -->
-    <section id="ai-consult" class="py-12 bg-white px-4">
-        <div class="max-w-md mx-auto bg-gradient-to-b from-orange-50 to-white rounded-[3rem] p-8 shadow-xl relative overflow-hidden border-t-4 border-nagi-orange">
-            <div class="flex flex-col items-center mb-6 text-center">
-                <div class="w-24 h-24 mb-3 relative">
-                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="100" cy="100" r="80" fill="white" stroke="#e5e7eb" />
-                        <path d="M70,70 L80,50 L95,65 Z" fill="#3d2b1f" /><path d="M130,70 L120,50 L105,65 Z" fill="#f97316" />
-                        <circle cx="85" cy="100" r="4" fill="#3d2b1f" /><circle cx="115" cy="100" r="4" fill="#3d2b1f" />
-                        <line x1="75" y1="105" x2="60" y2="102" stroke="#3d2b1f" stroke-width="1" /><line x1="125" y1="105" x2="140" y2="102" stroke="#3d2b1f" stroke-width="1" />
-                        <circle cx="94" cy="115" r="6" fill="white" stroke="#f3f4f6" /><circle cx="106" cy="115" r="6" fill="white" stroke="#f3f4f6" />
+    <section id="ai-consult" class="py-16 md:py-24 bg-white px-4">
+        <div class="max-w-3xl mx-auto bg-gradient-to-b from-orange-50 to-white rounded-[3rem] p-8 md:p-12 shadow-xl relative overflow-hidden border-t-8 border-nagi-orange">
+            <!-- 装飾 -->
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-orange-100/50 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-yellow-100/50 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="flex flex-col items-center mb-8 text-center relative z-10">
+                <div class="w-28 h-28 md:w-32 md:h-32 mb-4 relative drop-shadow-md hover:-translate-y-2 transition-transform duration-300">
+                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        <circle cx="100" cy="100" r="80" fill="white" stroke="#e5e7eb" stroke-width="4"/>
+                        <path d="M70,70 L80,45 L100,65 Z" fill="#3d2b1f" /><path d="M130,70 L120,45 L100,65 Z" fill="#f97316" />
+                        <circle cx="85" cy="100" r="5" fill="#3d2b1f" /><circle cx="115" cy="100" r="5" fill="#3d2b1f" />
+                        <line x1="75" y1="105" x2="55" y2="100" stroke="#3d2b1f" stroke-width="2" stroke-linecap="round"/><line x1="125" y1="105" x2="145" y2="100" stroke="#3d2b1f" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="94" cy="115" r="7" fill="white" stroke="#f3f4f6" /><circle cx="106" cy="115" r="7" fill="white" stroke="#f3f4f6" />
+                        <path d="M100,105 L104,110 L96,110 Z" fill="#f87171"/>
+                        <!-- メガネ追加 -->
+                        <path d="M70,100 A 15 15 0 1 0 100 100 A 15 15 0 1 0 70 100" fill="none" stroke="#60A5FA" stroke-width="3"/>
+                        <path d="M100,100 A 15 15 0 1 0 130 100 A 15 15 0 1 0 100 100" fill="none" stroke="#60A5FA" stroke-width="3"/>
+                        <line x1="95" y1="100" x2="105" y2="100" stroke="#60A5FA" stroke-width="3"/>
                     </svg>
                 </div>
-                <h2 class="text-xl font-black text-gray-800 font-cute">凪のバッグ相談室</h2>
-                <p class="text-[10px] text-nagi-orange font-black mt-1 uppercase tracking-tighter italic">Official AI Assistant Cat</p>
+                <h2 class="text-2xl md:text-3xl font-black text-gray-800 font-cute">凪のバッグ相談室</h2>
+                <p class="text-xs md:text-sm text-nagi-orange font-black mt-2 uppercase tracking-widest italic bg-white/80 px-4 py-1 rounded-full shadow-sm">AI Assistant Cat</p>
             </div>
 
-            <div class="space-y-4">
-                <div class="relative">
-                    <input id="ai-input" type="text" placeholder="人気の色あわせを教えてにゃ！" class="w-full bg-white border-2 border-orange-100 focus:border-nagi-orange rounded-full px-5 py-4 text-xs outline-none shadow-inner">
-                    <button onclick="askAI()" id="ai-btn" class="absolute right-2 top-2 bottom-2 bg-nagi-orange text-white px-4 rounded-full font-black text-xs shadow-md">🚀</button>
+            <div class="space-y-6 max-w-xl mx-auto relative z-10">
+                <div class="relative group">
+                    <input id="ai-input" type="text" placeholder="例：温泉に持っていくなら何色がおすすめ？" class="w-full bg-white border-2 border-orange-100 focus:border-nagi-orange focus:ring-4 focus:ring-orange-50 rounded-full px-6 py-4 md:py-5 text-sm md:text-base outline-none shadow-inner transition-all placeholder:text-gray-300">
+                    <button onclick="askAI()" id="ai-btn" class="absolute right-2 top-2 bottom-2 bg-nagi-orange hover:bg-orange-600 text-white px-6 rounded-full font-black text-sm md:text-base shadow-md transition-colors flex items-center gap-2">
+                        <span>相談する</span><span class="text-lg">🐾</span>
+                    </button>
                 </div>
-                <div id="ai-loading" class="hidden text-center py-4">
-                    <p class="text-[9px] text-gray-400 font-black animate-pulse uppercase">Thinking...</p>
+                
+                <div id="ai-loading" class="hidden text-center py-8">
+                    <div class="inline-flex items-center gap-2 text-nagi-orange font-black text-sm animate-pulse">
+                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        一生懸命考えてるにゃ...
+                    </div>
                 </div>
-                <div id="ai-response" class="hidden p-6 bg-white rounded-[2rem] text-xs leading-relaxed border-2 border-orange-50 relative shadow-lg">
-                    <div id="ai-text" class="text-gray-700 font-bold"></div>
+                
+                <div id="ai-response" class="hidden p-6 md:p-8 bg-white rounded-[2rem] text-sm md:text-base leading-relaxed border-2 border-orange-100 shadow-lg relative">
+                    <div class="absolute -top-3 left-8 w-6 h-6 bg-white border-t-2 border-l-2 border-orange-100 transform rotate-45"></div>
+                    <div id="ai-text" class="text-gray-700 font-bold whitespace-pre-wrap relative z-10"></div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- フッター -->
-    <footer class="py-16 bg-gray-900 text-center text-white">
-        <p class="font-cute text-3xl mb-4 tracking-widest text-nagi-orange">凪 -nagi-</p>
-        <p class="text-[9px] text-gray-500 tracking-[0.4em] mb-8 uppercase font-bold">Handmade PP Band Bags / Kochi</p>
-        <div class="flex justify-center gap-6 mb-8 opacity-40">
-            <div class="w-2 h-2 bg-nagi-red rounded-full"></div>
-            <div class="w-2 h-2 bg-nagi-orange rounded-full"></div>
-            <div class="w-2 h-2 bg-nagi-yellow rounded-full"></div>
+    <footer class="py-12 bg-gray-900 text-center text-white relative overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 relative z-10">
+            <h2 class="text-2xl font-cute font-black text-nagi-orange mb-4">凪 -nagi-</h2>
+            <p class="text-xs md:text-sm text-gray-400 font-bold mb-8">びらふ マルシェ 特設サイト</p>
+            
+            <div class="flex justify-center gap-6 mb-8">
+                <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-nagi-orange transition-colors">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" /></svg>
+                </a>
+                <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-nagi-blue transition-colors">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
+                </a>
+            </div>
+            
+            <p class="text-[10px] text-gray-500">&copy; 2026 凪 -nagi- All rights reserved.</p>
         </div>
-        <p class="text-[9px] text-gray-600 font-black tracking-widest italic">© 2026 NAGI HANDMADE</p>
+        
+        <!-- フッター背景装飾 -->
+        <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-gray-800 to-transparent pointer-events-none"></div>
     </footer>
-</div>
 
-<script>
-    const apiKey = "";
+    <!-- JavaScript ロジック -->
+    <script>
+        // --- 汎用ユーティリティ ---
+        function fireConfetti(colors) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: colors || ['#ef4444', '#f97316', '#fbbf24', '#4ADE80', '#60A5FA', '#a855f7']
+            });
+        }
 
-    async function askAI() {
-        const input = document.getElementById('ai-input').value;
-        if (!input) return;
-
-        const btn = document.getElementById('ai-btn');
-        const loading = document.getElementById('ai-loading');
-        const responseDiv = document.getElementById('ai-response');
-        const responseText = document.getElementById('ai-text');
-
-        btn.disabled = true;
-        loading.classList.remove('hidden');
-        responseDiv.classList.add('hidden');
-
-        const systemPrompt = "あなたは高知のマルシェに出店する『凪 -nagi-』の看板三毛猫のくぅちゃんです。立派なお髭とプニプニの肉球が自慢です。PPバンドバッグの魅力を伝えてください。語尾は「〜だにゃ」「〜だにゃん」。100文字以内で回答してください。ちょっとした人生相談や世間話、時事話も好きで時々話します。";
-
-        const fetchWithRetry = async (retries = 2, delay = 500) => {
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: input }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] }
-                    })
-                });
-                if (!response.ok) throw new Error('API Error');
-                const data = await response.json();
-                return data.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (err) {
-                if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return fetchWithRetry(retries - 1, delay * 2);
-                }
-                throw err;
+        // --- スタンプ機能 ---
+        function applyStamp(type) {
+            const btn = document.getElementById(type + '-btn');
+            const stamp = document.getElementById('stamp-' + type);
+            
+            if (stamp && !stamp.classList.contains('active')) {
+                stamp.classList.add('active');
+                if (btn) btn.innerText = 'スタンプ獲得！';
+                fireConfetti(['#ef4444', '#f97316']);
             }
-        };
-
-        try {
-            const text = await fetchWithRetry();
-            responseText.innerText = text;
-            responseDiv.classList.remove('hidden');
-        } catch (err) {
-            responseText.innerText = "電波が届かないにゃ...会場で待ってるにゃん！";
-            responseDiv.classList.remove('hidden');
-        } finally {
-            btn.disabled = false;
-            loading.classList.add('hidden');
         }
-    }
 
-    function applyStamp(type) {
-        const id = type === 'visit' ? 'stamp-visit' : 'stamp-game';
-        const el = document.getElementById(id);
-        if (el) el.classList.add('active');
-        if (type === 'visit') {
-            const btn = document.getElementById('visit-btn');
-            btn.innerText = "獲得済みだにゃ ✨";
-            btn.classList.replace('bg-nagi-red', 'bg-gray-300');
-            btn.disabled = true;
+        function winGameStamp() {
+            const stamp = document.getElementById('stamp-game');
+            if (stamp && !stamp.classList.contains('active')) {
+                stamp.classList.add('active');
+                // IDへのスクロール（少し遅延させて見せる）
+                setTimeout(() => {
+                    document.getElementById('rewards').scrollIntoView({ behavior: 'smooth' });
+                }, 1500);
+            }
         }
-    }
 
-    function setupGame() {
-        const btn = document.getElementById('start-btn');
+        // --- 落下棒ゲームロジック ---
+        const gameArea = document.getElementById('game-area');
         const stick = document.getElementById('falling-stick');
-        const area = document.getElementById('game-area');
-        const msg = document.getElementById('game-message');
-
-        const iconEl = document.getElementById('game-result-icon');
-        const titleEl = document.getElementById('game-result-title');
-        const descEl = document.getElementById('game-result-desc');
-        const boxEl  = document.getElementById('game-result-box');
-
-        const flash = document.getElementById('flash');
         const meterFill = document.getElementById('fall-meter-fill');
-        const meterDot  = document.getElementById('fall-meter-dot');
-        const hitMarker = document.getElementById('hit-marker');
-
+        const flash = document.getElementById('flash');
         const perfectOverlay = document.getElementById('perfect-overlay');
-        const perfectBG = perfectOverlay.querySelector('.perfect-bg');
         const perfectBadge = document.getElementById('perfect-badge');
+        const messageBox = document.getElementById('game-message');
+        const resultBox = document.getElementById('game-result-box');
+        const resultIcon = document.getElementById('game-result-icon');
+        const resultTitle = document.getElementById('game-result-title');
+        const resultDesc = document.getElementById('game-result-desc');
+        const hitMarker = document.getElementById('hit-marker');
+        
+        let gameActive = false;
+        let stickY = -200;
+        let speed = 0;
+        let animationId;
+        const targetY = 250; // キャッチ成功判定のY座標基準（ゲームエリア高さの半分程度）
+        const tolerance = 40; // 成功判定の許容範囲 (±)
+        const perfectTolerance = 15; // ドンピシャ判定の許容範囲
 
-        let isFalling = false;
-        let animationFrame = null;
-        let pos = -200;
-        const speed = 20;
+        function startGame() {
+            if (gameActive) return;
+            
+            // リセット
+            resetGameUI();
+            
+            gameActive = true;
+            stickY = -200;
+            speed = 8 + Math.random() * 5; // 速度をランダムに変化させて難易度アップ
+            stick.style.display = 'block';
+            stick.style.top = stickY + 'px';
+            
+            document.getElementById('start-btn').innerText = '集中...';
+            document.getElementById('start-btn').disabled = true;
 
-        // canvas-confettiはオプションで演出を制御できる（particleCount/spread/startVelocity/ticks/origin/colors/shapes等）[4](https://deepwiki.com/catdad/canvas-confetti/3-api-reference)[5](https://lets-csharp.com/canvas-confetti-test/)
-        const confettiSafe = (opts) => confetti({ ...opts });
+            // アニメーションループ開始
+            lastTime = performance.now();
+            animationId = requestAnimationFrame(gameLoop);
+        }
 
-        const sakuraColors = ['#FBCFE8', '#F9A8D4', '#FDE2E2', '#ffffff'];
-        const rainbow = ['#60A5FA', '#A855F7', '#F472B6', '#FBBF24', '#F97316', '#4ADE80'];
+        let lastTime = 0;
+        function gameLoop(time) {
+            if (!gameActive) return;
 
-        const reset = () => {
-            isFalling = false;
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-            animationFrame = null;
+            const deltaTime = time - lastTime;
+            lastTime = time;
 
-            stick.style.display = 'none';
-            stick.style.top = '-200px';
+            // 棒を落下させる (フレームレートに依存しないようにdeltaTimeを使用)
+            stickY += speed * (deltaTime / 16.6); 
+            stick.style.top = stickY + 'px';
 
-            msg.style.opacity = '0';
-            btn.disabled = false;
+            // メーター更新 (棒の位置を0-100%に変換)
+            const progress = Math.min(100, Math.max(0, ((stickY + 200) / 700) * 100));
+            meterFill.style.height = progress + '%';
 
-            hitMarker.style.display = 'none';
-            meterFill.style.height = '0%';
-            meterDot.style.bottom  = '0%';
-
-            flash.classList.remove('active','mega');
-            area.classList.remove('shake');
-            stick.classList.remove('glow');
-
-            perfectOverlay.classList.add('hidden');
-            perfectBG.classList.remove('active');
-            perfectBadge.classList.remove('active');
-        };
-
-        const setResult = ({icon, title, desc, color, border}) => {
-            iconEl.innerText = icon;
-            titleEl.innerText = title;
-            descEl.innerText = desc;
-            descEl.className = `text-[10px] font-bold ${color}`;
-            boxEl.style.borderColor = border;
-            msg.style.opacity = '1';
-        };
-
-        const showFlash = (mega=false) => {
-            flash.classList.remove('active','mega');
-            void flash.offsetWidth;
-            flash.classList.add(mega ? 'mega' : 'active');
-        };
-
-        const shakeArea = () => {
-            area.classList.remove('shake');
-            void area.offsetWidth;
-            area.classList.add('shake');
-        };
-
-        const glowStick = () => {
-            stick.classList.remove('glow');
-            void stick.offsetWidth;
-            stick.classList.add('glow');
-        };
-
-        const showPerfectOverlay = () => {
-            perfectOverlay.classList.remove('hidden');
-            perfectBG.classList.remove('active');
-            perfectBadge.classList.remove('active');
-            void perfectOverlay.offsetWidth;
-            perfectBG.classList.add('active');
-            perfectBadge.classList.add('active');
-            setTimeout(() => {
-                perfectOverlay.classList.add('hidden');
-                perfectBG.classList.remove('active');
-                perfectBadge.classList.remove('active');
-            }, 1100);
-        };
-
-        // getBoundingClientRectで「見えてる/見えてない」を厳密に判定（表示位置ベース）[1](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect)
-        const getVisibilityState = () => {
-            if (stick.style.display === 'none') return { state: 'hidden' };
-
-            const areaRect = area.getBoundingClientRect();
-            const stickRect = stick.getBoundingClientRect();
-
-            if (stickRect.bottom <= areaRect.top) return { state: 'notYet', areaRect, stickRect };
-            if (stickRect.top >= areaRect.bottom) return { state: 'tooLate', areaRect, stickRect };
-            return { state: 'visible', areaRect, stickRect };
-        };
-
-        const updateMeter = () => {
-            if (stick.style.display === 'none') return;
-            const areaRect = area.getBoundingClientRect();
-            const stickRect = stick.getBoundingClientRect();
-            const centerY = (stickRect.top + stickRect.height/2) - areaRect.top;
-            const progress = Math.max(0, Math.min(1, centerY / areaRect.height));
-            meterFill.style.height = `${progress*100}%`;
-            meterDot.style.bottom  = `${progress*100}%`;
-        };
-
-        const celebrateNormal = () => {
-            confettiSafe({
-                particleCount: 140,
-                spread: 85,
-                startVelocity: 52,
-                colors: ['#ef4444', '#f97316', '#60A5FA', '#fbbf24'],
-                origin: { x: 0.5, y: 0.78 },
-                scalar: 1.0,
-                shapes: ['square','circle']
-            });
-
-            const end = Date.now() + 1200;
-            (function fall(){
-                confettiSafe({
-                    particleCount: 6,
-                    spread: 70,
-                    startVelocity: 12,
-                    colors: sakuraColors,
-                    origin: { x: Math.random(), y: 0.0 },
-                    angle: 270,
-                    gravity: 0.55,
-                    ticks: 520,
-                    scalar: 0.9,
-                    shapes: ['circle']
-                });
-                if (Date.now() < end) requestAnimationFrame(fall);
-            })();
-        };
-
-        // ドンピシャ：爆盛り（花火/星/左右祝砲/桜吹雪ロング）
-        const celebratePerfectMega = ({x=0.5, y=0.60}={}) => {
-            confettiSafe({
-                particleCount: 220,
-                spread: 120,
-                startVelocity: 70,
-                colors: rainbow,
-                origin: { x, y },
-                scalar: 1.15,
-                shapes: ['circle','square']
-            });
-
-            // 花火（360°）[5](https://lets-csharp.com/canvas-confetti-test/)
-            const firework = (ox, oy) => confettiSafe({
-                particleCount: 120,
-                startVelocity: 34,
-                spread: 360,
-                ticks: 70,
-                gravity: 0.95,
-                colors: sakuraColors,
-                origin: { x: ox, y: oy },
-                shapes: ['circle'],
-                scalar: 1.05
-            });
-            firework(Math.min(0.85, x + 0.12), Math.max(0.20, y - 0.22));
-            firework(Math.max(0.15, x - 0.12), Math.max(0.22, y - 0.18));
-
-            // 左右祝砲 3連射
-            const side = (left, t) => setTimeout(() => confettiSafe({
-                particleCount: 90,
-                spread: 55,
-                startVelocity: 74,
-                colors: rainbow,
-                origin: { x: left ? 0.02 : 0.98, y: 0.82 },
-                angle: left ? 45 : 135,
-                scalar: 1.0,
-                shapes: ['square','circle']
-            }), t);
-            side(true, 0); side(false, 0);
-            side(true, 140); side(false, 140);
-            side(true, 280); side(false, 280);
-
-            // 星の雨
-            confettiSafe({
-                particleCount: 120,
-                spread: 75,
-                startVelocity: 18,
-                ticks: 500,
-                gravity: 0.35,
-                colors: ['#fff7ed', '#fde68a', '#93c5fd', '#ffffff'],
-                shapes: ['star'],
-                origin: { x: 0.5, y: 0.0 },
-                scalar: 1.2
-            });
-
-            // 桜吹雪ロング
-            const end = Date.now() + 2400;
-            (function fall(){
-                confettiSafe({
-                    particleCount: 8,
-                    spread: 75,
-                    startVelocity: 12,
-                    colors: sakuraColors,
-                    origin: { x: Math.random(), y: 0.0 },
-                    angle: 270,
-                    gravity: 0.55,
-                    ticks: 650,
-                    scalar: 0.95,
-                    shapes: ['circle']
-                });
-                if (Date.now() < end) requestAnimationFrame(fall);
-            })();
-        };
-
-        const showMissMessage = (type) => {
-            if (type === 'notYet') {
-                setResult({
-                    icon:"💦",
-                    title:"ちょっと先走り過ぎだにゃ！",
-                    desc:"まだ棒が見えてないにゃん！もう少し待つにゃ！",
-                    color:"text-nagi-red",
-                    border:"#ef4444"
-                });
-            } else if (type === 'tooLate') {
-                setResult({
-                    icon:"🐢",
-                    title:"遅いにゃ！",
-                    desc:"もう落ち切って消えちゃったにゃ〜！",
-                    color:"text-gray-500",
-                    border:"#9ca3af"
-                });
-            } else {
-                setResult({
-                    icon:"👀",
-                    title:"棒をタッチしてにゃ！",
-                    desc:"今棒は見えてるにゃん！落下してる棒そのものに触れるとキャッチ判定だにゃ！",
-                    color:"text-gray-500",
-                    border:"#9ca3af"
-                });
-            }
-            shakeArea();
-            showFlash(false);
-            btn.innerText = "もう一度挑戦だにゃ！";
-            btn.disabled = false;
-        };
-
-        btn.onclick = () => {
-            if (isFalling) return;
-            reset();
-            btn.innerText = "...集中だにゃ...";
-            btn.disabled = true;
-
-            setTimeout(() => {
-                isFalling = true;
-                stick.style.display = 'block';
-                pos = -200;
-
-                const frame = () => {
-                    if (!isFalling) return;
-                    pos += speed;
-                    stick.style.top = pos + 'px';
-                    updateMeter();
-
-                    if (pos > 520) {
-                        isFalling = false;
-                        btn.innerText = "惜しいニャ！もう一度！";
-                        btn.disabled = false;
-                        stick.style.display = 'none';
-                        return;
-                    }
-                    animationFrame = requestAnimationFrame(frame);
-                };
-                animationFrame = requestAnimationFrame(frame);
-            }, Math.random() * 2000 + 1000);
-        };
-
-        // pointerdownはマウス/タッチ等を統一して扱える[2](https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerdown_event)[3](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)
-        const catchStick = (e) => {
-            if (!isFalling) return;
-            e.stopPropagation();
-            if (e.cancelable) e.preventDefault();
-
-            const vis = getVisibilityState();
-            if (vis.state === 'notYet') {
-                isFalling = false; if (animationFrame) cancelAnimationFrame(animationFrame);
-                showMissMessage('notYet');
-                return;
-            }
-            if (vis.state === 'tooLate') {
-                isFalling = false; if (animationFrame) cancelAnimationFrame(animationFrame);
-                showMissMessage('tooLate');
+            // 画面外に落ちたら失敗
+            if (stickY > gameArea.clientHeight) {
+                endGame(false);
                 return;
             }
 
-            // 見えてる＝キャッチ成功（棒内の触れた位置でコメント分岐）
-            isFalling = false;
-            if (animationFrame) cancelAnimationFrame(animationFrame);
+            animationId = requestAnimationFrame(gameLoop);
+        }
 
-            const { areaRect, stickRect } = vis;
+        function catchStick() {
+            if (!gameActive) return;
+            
+            // 判定
+            const distance = Math.abs(stickY - targetY);
+            
+            hitMarker.style.display = 'block'; // ヒットした場所を表示
 
-            const ratio = (e.clientY - stickRect.top) / stickRect.height;
-            const r = Math.max(0, Math.min(1, ratio));
-
-            hitMarker.style.display = 'block';
-            hitMarker.style.top = `${r*100}%`;
-
-            const centerY = (stickRect.top + stickRect.height/2) - areaRect.top;
-            const progress = Math.max(0, Math.min(1, centerY / areaRect.height));
-            const progressPct = Math.round(progress * 100);
-
-            const zone = (r < 0.33) ? 'top' : (r < 0.66) ? 'middle' : 'bottom';
-            const timing = (progress < 0.35) ? 'early' : (progress < 0.75) ? 'normal' : 'late';
-
-            const isPerfect = (zone === 'middle');
-
-            if (isPerfect) {
-                const timingText =
-                    timing === 'early' ? '早めにビシッと決めたにゃ！' :
-                    timing === 'late'  ? 'ギリギリでも真ん中！強いにゃ！' :
-                                         '完璧なタイミングだにゃ！';
-
-                setResult({
-                    icon:"🎯",
-                    title:"ドンピシャ！",
-                    desc:`真ん中をキャッチ！${timingText}（落下${progressPct}%）`,
-                    color:"text-nagi-blue",
-                    border:"#60A5FA"
-                });
-
-                showPerfectOverlay();
-                showFlash(true);
-                shakeArea();
-                glowStick();
-                celebratePerfectMega({x:0.5, y:0.62});
-
-                // Android等対応端末のみ（未対応なら何もしない）
-                if ('vibrate' in navigator) navigator.vibrate([40,40,40,80,60]);
+            if (distance <= perfectTolerance) {
+                // ドンピシャ
+                endGame(true, true);
+            } else if (distance <= tolerance) {
+                // 通常成功
+                endGame(true, false);
             } else {
-                let nuance = "";
-                if (zone === 'top') {
-                    nuance =
-                        timing === 'late' ? "ギリギリで上を掴んだにゃ！ナイス粘り！" :
-                        timing === 'early'? "まだ上の方…ちょい早めキャッチだにゃ！" :
-                                            "上の方を上手にキャッチだにゃ！";
+                // 失敗
+                endGame(false);
+            }
+        }
+
+        function endGame(isWin, isPerfect = false) {
+            gameActive = false;
+            cancelAnimationFrame(animationId);
+            
+            document.getElementById('start-btn').innerText = '練習スタートだにゃ！';
+            document.getElementById('start-btn').disabled = false;
+
+            // フラッシュ演出
+            flash.classList.remove('active');
+            void flash.offsetWidth; // reflow
+            flash.classList.add('active');
+
+            if (isWin) {
+                if (isPerfect) {
+                    perfectOverlay.style.display = 'block';
+                    perfectOverlay.classList.add('active');
+                    perfectBadge.classList.add('active');
+                    fireConfetti();
+                    setTimeout(() => fireConfetti(['#fbbf24', '#f97316']), 200);
                 } else {
-                    nuance =
-                        timing === 'late' ? "落ちる寸前に下の方をガシッ！神業寄りだにゃ！" :
-                        timing === 'early'? "まだ下の方…ちょい待ちでも良かったにゃ！" :
-                                            "下の方をしっかりキャッチだにゃ！";
+                    fireConfetti(['#60A5FA', '#a855f7']);
                 }
 
-                setResult({
-                    icon:"😸",
-                    title:"ナイスキャッチ！",
-                    desc:`${nuance}（落下${progressPct}%）`,
-                    color:"text-nagi-orange",
-                    border:"#f97316"
-                });
-
-                showFlash(false);
-                shakeArea();
-                glowStick();
-                celebrateNormal();
+                resultBox.className = "bg-white p-6 md:p-8 rounded-[2rem] shadow-2xl border-4 border-nagi-blue text-center transform scale-100 transition-transform duration-300";
+                resultIcon.innerText = "🎯";
+                resultTitle.innerText = isPerfect ? "神業キャッチ！" : "ナイスキャッチ！";
+                resultTitle.className = "text-lg md:text-xl font-black text-nagi-blue mb-2";
+                resultDesc.innerText = "特典スタンプ獲得だにゃん！";
+                
+                winGameStamp();
+            } else {
+                resultBox.className = "bg-white p-6 md:p-8 rounded-[2rem] shadow-2xl border-4 border-gray-300 text-center transform scale-100 transition-transform duration-300";
+                resultIcon.innerText = "💦";
+                resultTitle.innerText = "ああっ！惜しいにゃ...";
+                resultTitle.className = "text-lg md:text-xl font-black text-gray-600 mb-2";
+                resultDesc.innerText = "もう一回チャレンジだにゃ！";
             }
 
-            applyStamp('game');
-            btn.innerText = "大成功だにゃ！";
-            btn.disabled = false;
-        };
+            // メッセージ表示
+            messageBox.classList.remove('opacity-0', 'pointer-events-none');
+        }
 
-        const touchArea = (e) => {
-            if (!isFalling) return;
-            if (e.target === stick || stick.contains(e.target)) return;
+        function resetGame() {
+            resetGameUI();
+        }
 
-            if (e.cancelable) e.preventDefault();
+        function resetGameUI() {
+            messageBox.classList.add('opacity-0', 'pointer-events-none');
+            resultBox.classList.remove('scale-100');
+            resultBox.classList.add('scale-90');
+            perfectOverlay.style.display = 'none';
+            perfectOverlay.classList.remove('active');
+            perfectBadge.classList.remove('active');
+            hitMarker.style.display = 'none';
+            stick.style.display = 'none';
+            meterFill.style.height = '0%';
+        }
 
-            const vis = getVisibilityState();
-            if (vis.state === 'notYet') return showMissMessage('notYet');
-            if (vis.state === 'tooLate') return showMissMessage('tooLate');
-            return showMissMessage('miss');
-        };
+        // --- AI相談室ロジック ---
+        // Gemini APIの利用指示に基づく実装 (APIキーは環境から取得するかモックとして動作)
+        const apiKey = ""; // 実行環境で提供される想定
+        
+        async function askAI() {
+            const input = document.getElementById('ai-input');
+            const query = input.value.trim();
+            if (!query) return;
 
-        stick.addEventListener('pointerdown', catchStick, { passive:false });
-        area.addEventListener('pointerdown', touchArea, { passive:false });
+            const loading = document.getElementById('ai-loading');
+            const responseDiv = document.getElementById('ai-response');
+            const textDiv = document.getElementById('ai-text');
+            const btn = document.getElementById('ai-btn');
 
-        reset();
-    }
+            // UI更新
+            input.value = '';
+            input.disabled = true;
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            responseDiv.classList.add('hidden');
 
-    window.onload = setupGame;
-</script>
+            try {
+                let answer = "";
+                
+                // APIキーが存在する場合のみ本物のAPIを叩く
+                if (apiKey) {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                    const systemPrompt = "あなたは「凪 -nagi-」というPPバンドで作られた手編みバッグ専門店の公式AIアシスタントの猫です。語尾に「にゃ」や「にゃん」をつけて、明るく親切に答えてください。バッグは水洗い可能で軽く、温泉や買い物に便利です。";
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: query }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] }
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error("API Error");
+                    const data = await response.json();
+                    answer = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                }
+                
+                // APIキーがない、またはエラー時のフォールバック（ダミー応答）
+                if (!answer) {
+                    await new Promise(r => setTimeout(r, 1500)); // 通信風の待機
+                    
+                    if (query.includes('色') || query.includes('いろ')) {
+                        answer = "人気の色あわせだにゃ！\n普段使いなら「ネイビー×ホワイト」が落ち着いてて使いやすいにゃん。\n温泉やピクニックで目立ちたいなら、「イエロー×グリーン」の元気なカラーがおすすめだにゃ！🐾";
+                    } else if (query.includes('洗') || query.includes('汚れ')) {
+                        answer = "凪のバッグはPPバンド（プラスチックのヒモ）で編んでるから、水洗いができちゃうにゃ！\n汚れたらシャワーでジャーっと洗って、サッと拭き取るだけでOKだにゃん✨";
+                    } else {
+                        answer = `「${query}」についてだにゃ？\n凪のバッグは一つ一つ心を込めて手編みしてるから、とっても丈夫で長持ちするにゃん！ぜひ当日、会場で実物を手にとって見てほしいにゃ✨`;
+                    }
+                }
 
+                // 結果表示
+                textDiv.innerText = answer;
+                loading.classList.add('hidden');
+                responseDiv.classList.remove('hidden');
+
+            } catch (error) {
+                textDiv.innerText = "ごめんにゃさい、ちょっと考えすぎて頭がフリーズしちゃったにゃ💦 もう一回聞いてみてほしいにゃん！";
+                loading.classList.add('hidden');
+                responseDiv.classList.remove('hidden');
+            } finally {
+                input.disabled = false;
+                btn.disabled = false;
+                input.focus();
+            }
+        }
+
+        // Enterキーで送信
+        document.getElementById('ai-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                askAI();
+            }
+        });
+    </script>
 </body>
 </html>

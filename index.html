@@ -490,7 +490,7 @@
             
             gameActive = true;
             stickY = -200;
-            speed = 10 + Math.random() * 5; // 速度を遊びやすいように少しマイルドに調整
+            speed = 20 + Math.random() * 10; // 速度を遊びやすいように少しマイルドに調整
             stick.style.display = 'block';
             stick.style.top = stickY + 'px';
             
@@ -523,7 +523,39 @@
             }
             animationId = requestAnimationFrame(gameLoop);
         }
+function catchStick(e) {
+            if (e && e.cancelable) e.preventDefault();
+            if (!gameActive) return;
+            
+            // タッチ/クリックした位置を取得
+            const rect = gameArea.getBoundingClientRect();
+            const touchY = e.touches ? e.touches[0].clientY : e.clientY;
+            const relativeTouchY = touchY - rect.top; // 画面内でのタッチ位置
 
+            // 棒の現在の位置（上端）と下端を計算
+            const stickTop = stickY;
+            const stickBottom = stickY + stick.offsetHeight;
+            const stickCenter = stickY + (stick.offsetHeight / 2);
+
+            // ヒットマーカーを表示
+            hitMarker.style.top = relativeTouchY + 'px';
+            hitMarker.style.display = 'block';
+
+            // --- 判定ロジック ---
+            // タッチした位置が、棒の「見た目」の範囲内に入っているかチェック
+            if (relativeTouchY >= stickTop && relativeTouchY <= stickBottom) {
+                // 棒のちょうど真ん中付近を掴めたらパーフェクト
+                const centerDistance = Math.abs(relativeTouchY - stickCenter);
+                if (centerDistance <= 30) {
+                    endGame(true, true); // パーフェクト
+                } else {
+                    endGame(true, false); // 通常キャッチ
+                }
+            } else {
+                // 棒の範囲外をタッチした場合は失敗
+                endGame(false);
+            }
+        }
         function catchStick(e) {
             if (e && e.cancelable) e.preventDefault();
             if (!gameActive) return;
